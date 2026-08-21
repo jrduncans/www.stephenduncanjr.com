@@ -83,13 +83,14 @@ Remove all fixtures before declaring the phase complete.
 - Workflow: `.github/workflows/jekyll.yml`.
 - Runtime pins: Ruby `4.0.6`, Bundler `4.0.19`, Jekyll `4.4.1` from the
   committed Gemfile and lockfile.
-- Action pins: `actions/checkout` `v6.0.2`, `ruby/setup-ruby` `v1.321.0`,
+- Action pins: `actions/checkout` `v7.0.1`, `ruby/setup-ruby` `v1.321.0`,
   `actions/configure-pages` `v6.0.0`, `actions/upload-pages-artifact` `v5.0.0`,
   and `actions/deploy-pages` `v5.0.0`; every action is pinned to a full commit
   SHA with a version comment.
 - Workflow behavior: pull requests and all pushes run the production build and
-  `bin/check-site`; artifact upload and deployment require a successful push to
-  `refs/heads/main`. Deployment targets the `github-pages` environment and uses
+  `bundle exec bin/check-site`; artifact upload and deployment require a
+  successful push to `refs/heads/main`. Deployment targets the `github-pages`
+  environment and uses
   non-canceling `github-pages` concurrency. Build permissions are `contents: read`
   and `pages: read`; deployment permissions are `pages: write` and
   `id-token: write`.
@@ -98,12 +99,12 @@ Remove all fixtures before declaring the phase complete.
   production config remains unchanged for local preview and the final custom
   domain.
 - Local verification: `mise exec -- bundle install`, the pinned Ruby/Bundler/
-  Jekyll version checks, a production build, `mise exec -- bin/check-site`, and
-  `mise exec -- git diff --check` passed. `bin/check-site` verified all 448
-  compatibility paths, current-post filtering, feed XML, legacy separation,
-  validation failures, and Rouge fixture output.
+  Jekyll version checks, a production build, `mise exec -- bundle exec bin/check-site`,
+  and `mise exec -- git diff --check` passed. `bin/check-site`
+  verified all 448 compatibility paths, current-post filtering, feed XML,
+  legacy separation, validation failures, and Rouge fixture output.
 - Pages-base-path verification: an isolated build with
-  `https://jrduncans.github.io` and `/jrduncans` project settings passed
+  `https://jrduncans.github.io` and `/www.stephenduncanjr.com` project settings passed
   canonical, CSS, feed, archive, and 404 checks. The fresh artifact measured
   4.0 MB across 452 files. The local checkout measured 8.9 MB and its Git object
   database 2.0 MB.
