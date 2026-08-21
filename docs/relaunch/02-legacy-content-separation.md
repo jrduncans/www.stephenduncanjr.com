@@ -1,6 +1,6 @@
 # Phase 2: Legacy content separation
 
-Status: ready
+Status: complete
 
 ## Objective
 
@@ -88,6 +88,59 @@ Add automated checks proving:
 
 ## Handoff record
 
-When complete, record the classification mechanism, feed implementation,
-archive coverage, intentional exceptions, and verification results here. Mark
-Phase 2 complete and Phases 3 and 4 ready in `README.md`.
+### Classification mechanism
+
+- Posts remain unchanged. The homepage, feed, and archive use `era: current` as
+  the only current-post marker; every other post is legacy.
+- Legacy non-post pages receive `legacy: true` through the `type: pages` path
+  default in `_config.yml`. The homepage opts out with `legacy: false`; the
+  archive and error documents opt out of the default but explicitly set
+  `noindex: true`.
+- Month and tag archive pages are identified by their generated `page.type`
+  values and receive `noindex,follow` in the shared base layout. The same
+  layout adds a self-canonical HTTPS `www` URL to legacy HTML pages.
+- New current posts must carry both `era: current` and an explicit
+  `/posts/<slug>/` permalink in their front matter. Existing post front matter
+  and bodies were not edited.
+
+### Feed and archive
+
+- `feed.xml` is now a checked-in Atom template rather than the plugin's default
+  post selection. It emits at most 15 current-era posts and is valid with zero
+  entries while the current era is empty. The `jekyll-feed` plugin remains
+  installed for feed discovery metadata and future compatibility.
+- `/archive/` groups all legacy posts by publication year and title, then links
+  to writing, pictures, projects, Firefox, research PDF, About, and preserved
+  compatibility pages. It is `noindex,follow` and is not linked from the
+  current navigation yet; Phase 3 owns the subdued footer link.
+- The existing month and tag archive routes remain present and are noindexed.
+  The archive sidebar now derives only from current posts, so legacy month
+  links do not appear in normal navigation.
+
+### Compatibility and intentional exceptions
+
+- `/feeds/posts/default/` is a static noindex HTML redirect to `/feed.xml`,
+  preserving the former feed route without adding a server runtime. The
+  existing S3 redirect remains documented for the pre-cutover deployment.
+- `/404.html` is a noindex current error document; the existing `/error.html`
+  path remains available and noindexed for baseline compatibility.
+- No sitemap or `robots.txt` was introduced in this phase. Legacy URLs remain
+  crawlable so crawlers can see their noindex directives.
+- Binary/static assets are intentional technical/static exceptions rather than
+  archive navigation pages. Historical post and auxiliary HTML pages,
+  including the Google ownership token file, are reachable from `/archive/` or
+  from the preserved index pages it links.
+
+### Verification results
+
+- `mise exec -- bin/check-site` passes after a fresh production build and
+  verifies all 448 Phase 1 compatibility paths.
+- The checker proves a known legacy post is absent from the homepage and feed,
+  has `noindex,follow` and its own HTTPS canonical, and that representative
+  month, tag, auxiliary, archive, 404, and compatibility pages are noindexed.
+- The checker validates the generated Atom feed as XML and checks archive
+  coverage for representative posts and all requested auxiliary sections.
+- An isolated temporary current-era post with an explicit `/posts/<slug>/`
+  permalink appears on the homepage and in the feed, stays out of `/archive/`,
+  and is absent from the production source/output.
+- `git diff --check` passes. No historical post body or legacy URL was changed.

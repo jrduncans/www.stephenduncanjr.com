@@ -1,6 +1,6 @@
 # Phase 4: Authoring workflow
 
-Status: blocked on Phase 2
+Status: ready
 
 ## Objective
 

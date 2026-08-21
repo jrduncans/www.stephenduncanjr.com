@@ -5,6 +5,17 @@
     <title>{{ site.title | escape }}{% if page.type == "month" %}: {{ page.date | date: "%B %Y" }}{% elsif page.title %}: {{ page.title | escape }}{% endif %}</title>
     <meta name="Author" content="Stephen Duncan Jr.">
     <meta name="description" content="{{ site.description | escape }}">
+    {%- assign legacy_content = false -%}
+    {%- if page.collection == "posts" and page.era != "current" -%}
+      {%- assign legacy_content = true -%}
+    {%- elsif page.legacy == true -%}
+      {%- assign legacy_content = true -%}
+    {%- endif -%}
+    {%- if page.type == "month" or page.type == "tag" or page.noindex == true or page.url == "/archive/" or page.url == "/404.html" -%}
+      {%- assign legacy_content = true -%}
+    {%- endif -%}
+    {% if legacy_content %}<meta name="robots" content="noindex,follow">{% endif %}
+    <link rel="canonical" href="{{ page.url | absolute_url }}">
     <meta name="keywords" content="Stephen,Duncan,Stephen Duncan">
     <meta name="google-site-verification" content="azz-gr6wqTzFwH604lYSEIaCoBhzniepgoYUe42Ix5M">
     <link rel="me" href="https://hachyderm.io/@jrduncans">

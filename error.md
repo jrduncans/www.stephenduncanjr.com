@@ -1,6 +1,7 @@
 ---
 layout: default
 title: Page Not Found
+noindex: true
 ---
 # 404 Not Found
 

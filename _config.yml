@@ -2,7 +2,7 @@ title: Stephen's Statements
 email: webmaster@stephenduncanjr.com
 description: A little bit of everything from Stephen Duncan Jr, a Software Developer in Portland, Oregon
 baseurl: ""
-url: http://www.stephenduncanjr.com
+url: https://www.stephenduncanjr.com
 permalink: /:year/:month/:title:output_ext
 excerpt_separator: ""
 
@@ -27,6 +27,12 @@ defaults:
     values:
       layout: post
       author: Stephen
+  -
+    scope:
+      path: ""
+      type: pages
+    values:
+      legacy: true
 
 jekyll-archives:
   enabled:

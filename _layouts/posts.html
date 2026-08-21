@@ -4,7 +4,8 @@ layout: base
 <div id="content_section">
   {%- include update.html -%}
 
-  {%- assign postsByDate = site.posts | limit: 15 | group_by_exp:"post", "post.date | date: '%A, %B %e, %Y'" -%}
+  {%- assign current_posts = site.posts | where: "era", "current" -%}
+  {%- assign postsByDate = current_posts | limit: 15 | group_by_exp:"post", "post.date | date: '%A, %B %e, %Y'" -%}
   {%- for date in postsByDate -%}
     <h2 class="DateHeader">
       {{ date.name }}

@@ -67,3 +67,106 @@ if (( missing_count > 0 )); then
 fi
 
 printf 'Verified %d required legacy paths in a fresh build.\n' "$required_count"
+
+assert_file() {
+  local path="$1"
+
+  if [[ ! -f "$path" ]]; then
+    printf 'Expected output is missing: %s\n' "$path" >&2
+    exit 1
+  fi
+}
+
+assert_contains() {
+  local path="$1"
+  local expected="$2"
+
+  if ! rg -Fq -- "$expected" "$path"; then
+    printf 'Expected %s to contain: %s\n' "$path" "$expected" >&2
+    exit 1
+  fi
+}
+
+assert_not_contains() {
+  local path="$1"
+  local unexpected="$2"
+
+  if rg -Fq -- "$unexpected" "$path"; then
+    printf 'Expected %s not to contain: %s\n' "$path" "$unexpected" >&2
+    exit 1
+  fi
+}
+
+legacy_post="$destination/2002/03/testing.html"
+archive_page="$destination/archive/index.html"
+feed_page="$destination/feed.xml"
+
+assert_file "$archive_page"
+assert_file "$destination/404.html"
+assert_file "$destination/feeds/posts/default/index.html"
+assert_file "$feed_page"
+assert_contains "$archive_page" 'Previous site, 2002–2018'
+assert_contains "$archive_page" '<meta name="robots" content="noindex,follow">'
+assert_contains "$archive_page" '/2002/03/testing.html'
+assert_contains "$archive_page" '/writing/writing.html'
+assert_contains "$archive_page" '/pictures.html'
+assert_contains "$archive_page" '/projects.html'
+assert_contains "$archive_page" '/firefoxthemes.html'
+assert_contains "$archive_page" 'CooperDuncanGregg4.pdf'
+assert_contains "$legacy_post" '<meta name="robots" content="noindex,follow">'
+assert_contains "$legacy_post" '<link rel="canonical" href="https://www.stephenduncanjr.com/2002/03/testing.html">'
+assert_contains "$destination/about.html" '<meta name="robots" content="noindex,follow">'
+assert_contains "$destination/google719de6b83ee3367a.html" '<meta name="robots" content="noindex,follow">'
+assert_contains "$destination/2005/04/index.html" '<meta name="robots" content="noindex,follow">'
+assert_contains "$destination/tag/programming/index.html" '<meta name="robots" content="noindex,follow">'
+assert_contains "$destination/404.html" '<meta name="robots" content="noindex,follow">'
+assert_contains "$destination/feeds/posts/default/index.html" '<meta name="robots" content="noindex,follow">'
+assert_not_contains "$destination/index.html" 'Testing'
+assert_not_contains "$feed_page" 'testing.html'
+assert_not_contains "$archive_page" 'era: current'
+
+fixture_source="$(mktemp -d "${TMPDIR:-/tmp}/stephenduncan-current-fixture-source.XXXXXX")"
+fixture_destination="$(mktemp -d "${TMPDIR:-/tmp}/stephenduncan-current-fixture-build.XXXXXX")"
+fixture_word="fixture"
+fixture_slug="phase-2-current-${fixture_word}"
+
+cleanup_fixture() {
+  rm -rf -- "$destination" "$fixture_source" "$fixture_destination"
+}
+trap cleanup_fixture EXIT
+
+cp -R -- "$root_dir"/. "$fixture_source"/
+cat > "$fixture_source/_posts/2026-08-20-${fixture_slug}.md" <<EOF
+---
+layout: post
+title: Phase 2 Current Fixture
+date: 2026-08-20 12:00:00 -0700
+era: current
+permalink: /posts/${fixture_slug}/
+---
+
+This post exists only for the phase verification build.
+EOF
+
+printf 'Building isolated current-era fixture in %s\n' "$fixture_destination"
+TZ=America/Los_Angeles JEKYLL_ENV=production bundle exec jekyll build \
+  --source "$fixture_source" \
+  --destination "$fixture_destination"
+
+assert_contains "$fixture_destination/index.html" 'Phase 2 Current Fixture'
+assert_contains "$fixture_destination/feed.xml" 'Phase 2 Current Fixture'
+assert_contains "$fixture_destination/feed.xml" "/posts/${fixture_slug}/"
+assert_not_contains "$fixture_destination/posts/${fixture_slug}/index.html" '<meta name="robots" content="noindex,follow">'
+assert_not_contains "$fixture_destination/archive/index.html" 'Phase 2 Current Fixture'
+assert_not_contains "$destination/index.html" 'Phase 2 Current Fixture'
+assert_not_contains "$destination/feed.xml" 'Phase 2 Current Fixture'
+if ! ruby -rrexml/document -e 'REXML::Document.new(File.read(ARGV.fetch(0)))' "$feed_page"; then
+  printf 'Generated feed is not valid XML: %s\n' "$feed_page" >&2
+  exit 1
+fi
+if rg -Fq -- "$fixture_slug" "$root_dir/_posts"; then
+  printf 'Temporary current-era fixture leaked into production source.\n' >&2
+  exit 1
+fi
+
+printf 'Verified current-era homepage/feed inclusion and legacy separation.\n'
