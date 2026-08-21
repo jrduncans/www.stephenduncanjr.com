@@ -18,6 +18,8 @@ fi
 
 cd "$root_dir"
 
+bin/check-current-posts
+
 printf 'Building a fresh site in %s\n' "$destination"
 printf 'Build timezone: America/Los_Angeles\n'
 TZ=America/Los_Angeles JEKYLL_ENV="${JEKYLL_ENV:-production}" bundle exec jekyll build --destination "$destination"
@@ -158,11 +160,16 @@ cat > "$fixture_source/_posts/2026-08-20-${fixture_slug}.md" <<EOF
 layout: post
 title: Phase 2 Current Fixture
 date: 2026-08-20 12:00:00 -0700
+description: Temporary current-era fixture used by the compatibility check.
 era: current
 permalink: /posts/${fixture_slug}/
 ---
 
 This post exists only for the phase verification build.
+
+~~~ruby
+puts "Rouge fixture"
+~~~
 EOF
 
 printf 'Building isolated current-era fixture in %s\n' "$fixture_destination"
@@ -173,6 +180,7 @@ TZ=America/Los_Angeles JEKYLL_ENV=production bundle exec jekyll build \
 assert_contains "$fixture_destination/index.html" 'Phase 2 Current Fixture'
 assert_contains "$fixture_destination/feed.xml" 'Phase 2 Current Fixture'
 assert_contains "$fixture_destination/feed.xml" "/posts/${fixture_slug}/"
+assert_contains "$fixture_destination/posts/${fixture_slug}/index.html" 'language-ruby'
 assert_not_contains "$fixture_destination/posts/${fixture_slug}/index.html" '<meta name="robots" content="noindex,follow">'
 assert_not_contains "$fixture_destination/archive/index.html" 'Phase 2 Current Fixture'
 assert_not_contains "$destination/index.html" 'Phase 2 Current Fixture'
@@ -187,3 +195,116 @@ if rg -Fq -- "$fixture_slug" "$root_dir/_posts"; then
 fi
 
 printf 'Verified current-era homepage/feed inclusion and legacy separation.\n'
+
+validation_fixture_source="$(mktemp -d "${TMPDIR:-/tmp}/stephenduncan-current-validation.XXXXXX")"
+cleanup_validation_fixture() {
+  rm -rf -- "$destination" "$fixture_source" "$fixture_destination" "$validation_fixture_source"
+}
+trap cleanup_validation_fixture EXIT
+cp -R -- "$root_dir"/. "$validation_fixture_source"/
+
+check_invalid_current_post() {
+  local expected="$1"
+
+  if "$validation_fixture_source/bin/check-current-posts" >"$validation_fixture_source/check.out" 2>&1; then
+    printf 'Expected current-post validation to fail for: %s\n' "$expected" >&2
+    exit 1
+  fi
+  if ! rg -Fq -- "$expected" "$validation_fixture_source/check.out"; then
+    printf 'Expected current-post validation error: %s\n' "$expected" >&2
+    cat "$validation_fixture_source/check.out" >&2
+    exit 1
+  fi
+}
+
+cat > "$validation_fixture_source/_posts/2026-08-20-missing-description.md" <<'EOF'
+---
+layout: post
+title: Missing description fixture
+date: 2026-08-20 12:00:00 -0700
+era: current
+permalink: /posts/missing-description-fixture/
+---
+EOF
+check_invalid_current_post 'missing a short description'
+rm "$validation_fixture_source/_posts/2026-08-20-missing-description.md"
+
+cat > "$validation_fixture_source/_posts/2026-08-20-missing-era.md" <<'EOF'
+---
+layout: post
+title: Missing era fixture
+date: 2026-08-20 12:00:00 -0700
+description: A fixture with the new URL shape but no current-era marker.
+permalink: /posts/missing-era-fixture/
+---
+EOF
+check_invalid_current_post 'missing era: current'
+rm "$validation_fixture_source/_posts/2026-08-20-missing-era.md"
+
+cat > "$validation_fixture_source/_posts/2026-08-20-unmarked-dated-post.md" <<'EOF'
+---
+layout: post
+title: Unmarked dated post fixture
+date: 2026-08-20 12:00:00 -0700
+description: A new dated post must not silently become a legacy post.
+---
+EOF
+check_invalid_current_post 'is not a preserved legacy post and must set era: current'
+rm "$validation_fixture_source/_posts/2026-08-20-unmarked-dated-post.md"
+
+cat > "$validation_fixture_source/_posts/2026-08-20-duplicate-one.md" <<'EOF'
+---
+layout: post
+title: Duplicate one fixture
+date: 2026-08-20 12:00:00 -0700
+description: The first duplicate permalink fixture.
+era: current
+permalink: /posts/duplicate-fixture/
+---
+EOF
+cat > "$validation_fixture_source/_posts/2026-08-21-duplicate-two.md" <<'EOF'
+---
+layout: post
+title: Duplicate two fixture
+date: 2026-08-21 12:00:00 -0700
+description: The second duplicate permalink fixture.
+era: current
+permalink: /posts/duplicate-fixture/
+---
+EOF
+check_invalid_current_post 'duplicate current permalink /posts/duplicate-fixture/'
+rm "$validation_fixture_source/_posts/2026-08-20-duplicate-one.md" "$validation_fixture_source/_posts/2026-08-21-duplicate-two.md"
+
+cat > "$validation_fixture_source/_posts/2026-08-20-legacy-url.md" <<'EOF'
+---
+layout: post
+title: Legacy URL fixture
+date: 2026-08-20 12:00:00 -0700
+description: A fixture that must not reuse dated legacy URLs.
+era: current
+permalink: /2026/08/legacy-url.html
+---
+EOF
+check_invalid_current_post 'permalink must be /posts/<stable-slug>/'
+rm "$validation_fixture_source/_posts/2026-08-20-legacy-url.md"
+
+mkdir -p "$validation_fixture_source/posts/output-collision"
+cat > "$validation_fixture_source/posts/output-collision/index.md" <<'EOF'
+---
+layout: default
+title: Output collision fixture
+---
+EOF
+cat > "$validation_fixture_source/_posts/2026-08-20-output-collision.md" <<'EOF'
+---
+layout: post
+title: Output collision fixture
+date: 2026-08-20 12:00:00 -0700
+description: A fixture that collides with a page output path.
+era: current
+permalink: /posts/output-collision/
+---
+EOF
+check_invalid_current_post 'output /posts/output-collision/index.html collides with'
+
+printf 'Verified current-post validation failures and Rouge fenced-code output.\n'

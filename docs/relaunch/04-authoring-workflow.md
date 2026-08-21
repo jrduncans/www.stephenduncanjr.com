@@ -1,6 +1,6 @@
 # Phase 4: Authoring workflow
 
-Status: ready
+Status: complete
 
 ## Objective
 
@@ -96,6 +96,36 @@ Do not automate LinkedIn in this phase.
 
 ## Handoff record
 
-When complete, record the commands, generated front-matter schema, validation
-location, draft-to-publish flow, and verification results here. Mark Phase 4
-complete in `README.md`.
+### Authoring commands and schema
+
+- `bin/new-post "Title"` creates `_drafts/<conservative-slug>.md`, rejects
+  existing draft or published slugs, and supplies `layout`, `title`, empty
+  `description`, `era: current`, an explicit stable `/posts/<slug>/`
+  permalink, and a fenced Ruby example.
+- `bin/publish-post <slug>` requires title, description, `era: current`, and a
+  matching stable permalink; it adds a local timezone-aware date when absent,
+  writes `_posts/YYYY-MM-DD-<slug>.md` without overwriting, then removes the
+  draft. Editing a published title does not change its permalink.
+- Permanent instructions and the author checklist are in the repository root
+  `README.md`. They cover locked dependency installation, previewing drafts,
+  publication by commit and push, correction without URL changes, and the
+  owned-blog-before-LinkedIn requirement.
+
+### Validation and verification
+
+- `bin/check-current-posts`, invoked by `bin/check-site`, validates every
+  current post for title, non-empty description, explicit timezone-aware date,
+  date-form filename, explicit `/posts/<slug>/` permalink, duplicate
+  permalinks, legacy URL shapes, and output-path collisions with pages, posts,
+  or static files. Only post URLs present in the preserved legacy URL fixture
+  may omit `era: current`, so both `/posts/`-shaped and newly dated unmarked
+  posts fail instead of silently becoming legacy content.
+- `bin/check-site` creates isolated temporary fixtures for missing description,
+  missing era, an unmarked dated post, duplicate permalink, legacy URL, and
+  output-path collision errors. Its current-era fixture contains a fenced Ruby
+  block and verifies the generated Rouge output; no fixture or sample relaunch
+  post remains in source or production output.
+- Verification completed with `bundle install`, `bin/new-post` and
+  `bin/publish-post` in an isolated copy, `TZ=America/Los_Angeles
+  JEKYLL_ENV=production bundle exec jekyll build`, `bin/check-site`, and
+  `git diff --check`. No DNS, GitHub Pages, or AWS setting was changed.
