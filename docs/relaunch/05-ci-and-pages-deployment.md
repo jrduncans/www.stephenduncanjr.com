@@ -1,6 +1,6 @@
 # Phase 5: CI and GitHub Pages deployment
 
-Status: ready
+Status: blocked on repository Pages settings and public verification
 
 ## Objective
 
@@ -80,8 +80,44 @@ Remove all fixtures before declaring the phase complete.
 
 ## Handoff record
 
-When complete, record workflow paths, pinned runtime versions, the successful
-Actions run, temporary Pages URL, repository setting changed by the user,
-verification results, and any configuration required before Phase 6. Mark Phase
-5 complete and Phase 6 ready only when a substantive current post is also ready
-for launch.
+- Workflow: `.github/workflows/jekyll.yml`.
+- Runtime pins: Ruby `4.0.6`, Bundler `4.0.19`, Jekyll `4.4.1` from the
+  committed Gemfile and lockfile.
+- Action pins: `actions/checkout` `v6.0.2`, `ruby/setup-ruby` `v1.321.0`,
+  `actions/configure-pages` `v6.0.0`, `actions/upload-pages-artifact` `v5.0.0`,
+  and `actions/deploy-pages` `v5.0.0`; every action is pinned to a full commit
+  SHA with a version comment.
+- Workflow behavior: pull requests and all pushes run the production build and
+  `bin/check-site`; artifact upload and deployment require a successful push to
+  `refs/heads/main`. Deployment targets the `github-pages` environment and uses
+  non-canceling `github-pages` concurrency. Build permissions are `contents: read`
+  and `pages: read`; deployment permissions are `pages: write` and
+  `id-token: write`.
+- Pages URL handling: the main build writes an ephemeral runner-temp Jekyll
+  config from `configure-pages` outputs for `url`/`baseurl`; the committed
+  production config remains unchanged for local preview and the final custom
+  domain.
+- Local verification: `mise exec -- bundle install`, the pinned Ruby/Bundler/
+  Jekyll version checks, a production build, `mise exec -- bin/check-site`, and
+  `mise exec -- git diff --check` passed. `bin/check-site` verified all 448
+  compatibility paths, current-post filtering, feed XML, legacy separation,
+  validation failures, and Rouge fixture output.
+- Pages-base-path verification: an isolated build with
+  `https://jrduncans.github.io` and `/jrduncans` project settings passed
+  canonical, CSS, feed, archive, and 404 checks. The fresh artifact measured
+  4.0 MB across 452 files. The local checkout measured 8.9 MB and its Git object
+  database 2.0 MB.
+- Successful Actions run: none recorded. No `main` push was made from this
+  task, and deployment is not claimed.
+- Temporary Pages URL: not available until the repository Pages setting is
+  enabled and a successful `main` run is visible.
+- Repository setting changed by the user: none. Required gate: in repository
+  Settings → Pages → Build and deployment, set Source to **GitHub Actions**.
+  After that gate, run the workflow from `main`, record the generated temporary
+  URL, and complete the pre-DNS verification matrix including a subsequent
+  update push.
+- AWS/DNS state: no DNS, Pages setting, AWS resource, credential, or S3 file was
+  changed. `s3_website.yml` and the S3 origin remain available for rollback.
+- Phase 6 remains blocked on this Pages verification and a substantive
+  current-era post. Phase 5 must not be marked complete until the temporary
+  Pages site and update deployment are verified.
