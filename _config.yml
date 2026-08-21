@@ -8,6 +8,9 @@ excerpt_separator: ""
 
 exclude:
   - s3_website.yaml
+  - docs
+  - bin
+  - test
 
 sass:
   style: compressed

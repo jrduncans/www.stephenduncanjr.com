@@ -1,0 +1,69 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+root_dir="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
+fixture="$root_dir/test/fixtures/legacy-urls.txt"
+destination="$(mktemp -d "${TMPDIR:-/tmp}/stephenduncan-site-check.XXXXXX")"
+
+cleanup() {
+  rm -rf -- "$destination"
+}
+trap cleanup EXIT
+
+if [[ ! -f "$fixture" ]]; then
+  printf 'Missing compatibility fixture: %s\n' "$fixture" >&2
+  exit 1
+fi
+
+cd "$root_dir"
+
+printf 'Building a fresh site in %s\n' "$destination"
+printf 'Build timezone: America/Los_Angeles\n'
+TZ=America/Los_Angeles JEKYLL_ENV="${JEKYLL_ENV:-production}" bundle exec jekyll build --destination "$destination"
+
+if ! LC_ALL=C sort -c "$fixture" >/dev/null; then
+  printf 'Compatibility fixture is not sorted: %s\n' "$fixture" >&2
+  exit 1
+fi
+
+duplicates="$(LC_ALL=C sort "$fixture" | uniq -d)"
+if [[ -n "$duplicates" ]]; then
+  printf 'Compatibility fixture contains duplicate paths:\n%s\n' "$duplicates" >&2
+  exit 1
+fi
+
+required_count=0
+missing_count=0
+missing_paths=()
+
+while IFS= read -r url_path || [[ -n "$url_path" ]]; do
+  [[ -z "$url_path" ]] && continue
+
+  if [[ "$url_path" != /* ]]; then
+    printf 'Compatibility fixture contains a non-URL path: %s\n' "$url_path" >&2
+    exit 1
+  fi
+
+  if [[ "$url_path" == "/" ]]; then
+    output_path="$destination/index.html"
+  elif [[ "$url_path" == */ ]]; then
+    output_path="$destination/${url_path#/}index.html"
+  else
+    output_path="$destination/${url_path#/}"
+  fi
+
+  required_count=$((required_count + 1))
+  if [[ ! -f "$output_path" ]]; then
+    missing_count=$((missing_count + 1))
+    missing_paths+=("$url_path")
+  fi
+done < "$fixture"
+
+if (( missing_count > 0 )); then
+  printf 'Missing %d of %d required legacy paths:\n' "$missing_count" "$required_count" >&2
+  printf '  %s\n' "${missing_paths[@]}" >&2
+  exit 1
+fi
+
+printf 'Verified %d required legacy paths in a fresh build.\n' "$required_count"
