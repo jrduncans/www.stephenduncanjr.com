@@ -102,7 +102,8 @@ Remove all fixtures before declaring the phase complete.
   Jekyll version checks, a production build, `mise exec -- bundle exec bin/check-site`,
   and `mise exec -- git diff --check` passed. `bin/check-site`
   verified all 448 compatibility paths, current-post filtering, feed XML,
-  legacy separation, validation failures, and Rouge fixture output.
+  legacy separation, validation failures, and Rouge fixture output. The check
+  script uses standard `grep` assertions and does not require `rg` on the runner.
 - Pages-base-path verification: an isolated build with
   `https://jrduncans.github.io` and `/www.stephenduncanjr.com` project settings passed
   canonical, CSS, feed, archive, and 404 checks. The fresh artifact measured

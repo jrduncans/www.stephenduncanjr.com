@@ -83,7 +83,7 @@ assert_contains() {
   local path="$1"
   local expected="$2"
 
-  if ! rg -Fq -- "$expected" "$path"; then
+  if ! grep -Fq -- "$expected" "$path"; then
     printf 'Expected %s to contain: %s\n' "$path" "$expected" >&2
     exit 1
   fi
@@ -93,7 +93,7 @@ assert_not_contains() {
   local path="$1"
   local unexpected="$2"
 
-  if rg -Fq -- "$unexpected" "$path"; then
+  if grep -Fq -- "$unexpected" "$path"; then
     printf 'Expected %s not to contain: %s\n' "$path" "$unexpected" >&2
     exit 1
   fi
@@ -189,7 +189,7 @@ if ! ruby -rrexml/document -e 'REXML::Document.new(File.read(ARGV.fetch(0)))' "$
   printf 'Generated feed is not valid XML: %s\n' "$feed_page" >&2
   exit 1
 fi
-if rg -Fq -- "$fixture_slug" "$root_dir/_posts"; then
+if grep -RFq -- "$fixture_slug" "$root_dir/_posts"; then
   printf 'Temporary current-era fixture leaked into production source.\n' >&2
   exit 1
 fi
@@ -210,7 +210,7 @@ check_invalid_current_post() {
     printf 'Expected current-post validation to fail for: %s\n' "$expected" >&2
     exit 1
   fi
-  if ! rg -Fq -- "$expected" "$validation_fixture_source/check.out"; then
+  if ! grep -Fq -- "$expected" "$validation_fixture_source/check.out"; then
     printf 'Expected current-post validation error: %s\n' "$expected" >&2
     cat "$validation_fixture_source/check.out" >&2
     exit 1
