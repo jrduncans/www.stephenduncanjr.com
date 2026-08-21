@@ -1,20 +1,18 @@
 ---
 layout: base
 ---
-<div id="content_section">
-  {%- assign postsByDate = page.posts | group_by_exp:"post", "post.date | date: '%A, %B %e, %Y'" -%}
-  {%- for date in postsByDate -%}
-    <h2 class="DateHeader">
-      {{ date.name }}
-    </h2>
-    {%- for post in date.items -%}
-      {% include post.html item=post %}
+<article class="archive-page">
+  <header class="page-header">
+    <p class="eyebrow">Archive</p>
+    <h1>{{ page.title | default: "Posts" | smartify | escape }}</h1>
+  </header>
+  <div class="post-list">
+    {%- assign posts_by_date = page.posts | group_by_exp:"post", "post.date | date: '%A, %B %-d, %Y'" -%}
+    {%- for date in posts_by_date -%}
+      <h2 class="date-heading">{{ date.name }}</h2>
+      {%- for post in date.items -%}
+        {% include post.html item=post %}
+      {%- endfor -%}
     {%- endfor -%}
-  {%- endfor -%}
-</div>
-<div id="navigation_section">
-  {%- include navigation.html -%}
-  {%- include archive-sidebar.html -%}
-</div>
-
-<script id="dsq-count-scr" src="//stephensstatements.disqus.com/count.js" async></script>
+  </div>
+</article>

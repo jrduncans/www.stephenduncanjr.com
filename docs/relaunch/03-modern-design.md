@@ -1,6 +1,6 @@
 # Phase 3: Modern design
 
-Status: ready
+Status: complete
 
 ## Objective
 
@@ -107,6 +107,66 @@ completion.
 
 ## Handoff record
 
-When complete, record the layout and stylesheet structure, removed runtime
-dependencies, browser/viewport checks, remaining isolated legacy media issues,
-and verification results here. Mark Phase 3 complete in `README.md`.
+### Layout and stylesheet structure
+
+- `_layouts/base.html` now owns the document head, page-specific metadata,
+  self-canonical HTTPS `www` URLs, feed discovery, skip link, site header,
+  minimal navigation, main landmark, and footer.
+- `_layouts/default.html` provides the shared legacy page article wrapper;
+  `_layouts/post.html` provides the title/date/author/article/tag treatment for
+  both current and legacy posts; `_layouts/posts.html` provides the current-era
+  homepage and intentional empty state; `_layouts/archive.html` provides the
+  noindexed month/tag archive treatment.
+- `_includes/navigation.html` is reduced to the home link. The footer keeps the
+  required RSS link and one subdued `Previous site, 2002–2018` archive link.
+- `_sass/_main.scss` defines the responsive shell, system-font typography,
+  readable article measure, landmarks, focus states, lists, tables, quotes,
+  figures, overflow behavior, preserved writing-page labels, and reduced-motion
+  behavior. `_sass/_highlight.scss` provides the light/dark Rouge palette for
+  both Markdown fences and legacy `.highlight` markup.
+
+### Removed runtime dependencies
+
+- Removed shared Google JSAPI/jQuery loading, archive prettification, Disqus
+  embeds/count scripts, the Google custom-search form, and page-level inline
+  styles associated with those systems.
+- `js/main.js` remains only as an inert file to preserve the required historical
+  URL; no current page loads JavaScript.
+- Replaced the Flickr random-gallery script with a plain archive link and
+  upgraded all seven remaining active legacy Flickr image sources, plus the
+  preserved thumbnail-gallery image URLs, to HTTPS. Ordinary historical
+  outbound link URLs remain unchanged.
+
+### Browser and viewport checks
+
+- Fresh local build inspected in the Codex in-app browser at `390×844` and
+  `1440×900` in light mode for the homepage, a current-era fixture homepage and
+  article, a long code/list/table article, the legacy archive, and the 404 page.
+- The mobile checks reported no unintended horizontal overflow. The article
+  fixture rendered one Rouge code block, a table, lists, links, blockquote, and
+  tag metadata without JavaScript. The desktop checks showed the intended
+  text-first measure and code-block treatment.
+- The dark palette is implemented through `prefers-color-scheme: dark` custom
+  property overrides, with separate readable code-token colors and focus
+  contrast; the browser session used for the screenshot pass was in light mode.
+
+### Verification results
+
+- `TZ=America/Los_Angeles JEKYLL_ENV=production mise exec -- bundle exec jekyll build`
+  passed.
+- `mise exec -- bin/check-site` passed, verifying all 448 compatibility paths,
+  the legacy noindex/canonical rules, current-era fixture inclusion in the
+  homepage/feed, current-era exclusion from the archive, semantic shell/meta
+  markers, and the absence of obsolete homepage runtime hooks.
+- `git diff --check` passed. The generated Atom feed remains valid XML and
+  contains current-era posts only.
+- A generated-site root-relative-link audit checked 348 links. Current shell,
+  archive, tag, feed, and compatibility links resolve. Six pre-existing links
+  inside historical posts still point to removed old surfaces (`/blogroll.asp`,
+  `/politics`, two old project pages, and two unavailable Abdera downloads);
+  these are documented legacy exceptions rather than new design dependencies.
+- A source and generated-output scan found no remaining active HTTP image
+  sources in post content.
+
+Phase 3 is complete. The repository is ready for the Phase 4 authoring
+workflow work.

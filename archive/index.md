@@ -5,7 +5,6 @@ legacy: false
 noindex: true
 ---
 
-<h2>Previous site, 2002–2018</h2>
 <p>This is a quiet archive of the previous site. Historical pages remain
 available at their original URLs, but are no longer part of the site's current
 publishing surface.</p>

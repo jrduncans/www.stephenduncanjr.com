@@ -1,13 +1,12 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="robots" content="noindex,follow">
-    <meta http-equiv="refresh" content="0; url={{ page.redirect_to | relative_url }}">
-    <link rel="canonical" href="{{ page.redirect_to | absolute_url }}">
-    <title>{{ page.title | escape }}</title>
-  </head>
-  <body>
+---
+layout: base
+---
+<article class="page-content">
+  <header class="page-header">
+    <p class="eyebrow">Compatibility link</p>
+    <h1>{{ page.title | smartify | escape }}</h1>
+  </header>
+  <div class="prose">
     <p>This address has moved to <a href="{{ page.redirect_to | relative_url }}">{{ page.redirect_to | escape }}</a>.</p>
-  </body>
-</html>
+  </div>
+</article>

@@ -1,23 +1,27 @@
 ---
 layout: base
 ---
-<div id="content_section">
-  {%- include update.html -%}
+<article class="home-page">
+  <header class="page-header home-header">
+    <p class="eyebrow">Journal</p>
+    <h1>Notes on software, the web, and everything else</h1>
+    <p class="lede">A text-first home for Stephen Duncan Jr.’s writing.</p>
+  </header>
 
+  <section class="post-list" aria-labelledby="latest-heading">
+    <div class="section-heading">
+      <h2 id="latest-heading">Latest writing</h2>
+    </div>
   {%- assign current_posts = site.posts | where: "era", "current" -%}
-  {%- assign postsByDate = current_posts | limit: 15 | group_by_exp:"post", "post.date | date: '%A, %B %e, %Y'" -%}
-  {%- for date in postsByDate -%}
-    <h2 class="DateHeader">
-      {{ date.name }}
-    </h2>
-    {%- for post in date.items -%}
-      {% include post.html item=post %}
-    {%- endfor -%}
-  {%- endfor -%}
-</div>
-<div id="navigation_section">
-  {%- include navigation.html -%}
-  {%- include archive-sidebar.html -%}
-</div>
-
-<script id="dsq-count-scr" src="//stephensstatements.disqus.com/count.js" async></script>
+    {% if current_posts != empty %}
+      {%- for post in current_posts limit: 15 -%}
+        {% include post.html item=post %}
+      {%- endfor -%}
+    {% else %}
+      <div class="empty-state">
+        <h3>The next post is on its way.</h3>
+        <p>This site is ready for new writing. In the meantime, the <a href="{{ "/archive/" | relative_url }}">previous site archive</a> holds the older material.</p>
+      </div>
+    {% endif %}
+  </section>
+</article>

@@ -79,7 +79,7 @@ Every implementation phase must preserve these properties:
 | 1 | [Baseline and URL compatibility](01-baseline-and-url-compatibility.md) | Complete | None |
 | 1b | [Current, repeatable toolchain baseline](01b-toolchain-baseline.md) | Complete | Phase 1 |
 | 2 | [Legacy content separation](02-legacy-content-separation.md) | Complete | Phase 1b |
-| 3 | [Modern design](03-modern-design.md) | Ready | Phase 2 |
+| 3 | [Modern design](03-modern-design.md) | Complete | Phase 2 |
 | 4 | [Authoring workflow](04-authoring-workflow.md) | Ready | Phase 2 |
 | 5 | [CI and Pages deployment](05-ci-and-pages-deployment.md) | Blocked | Phases 1-4 |
 | 6 | [Domain cutover and cleanup](06-domain-cutover-and-cleanup.md) | Blocked | Phase 5 and a substantive post |

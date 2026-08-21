@@ -1,9 +1,14 @@
 ---
 layout: base
 ---
-<div id="content_section">
-  {{ content }}
-</div>
-<div id="navigation_section">
-  {%- include navigation.html -%}
-</div>
+<article class="page-content">
+  {% if page.title %}
+    <header class="page-header">
+      <p class="eyebrow">Previous site</p>
+      <h1>{{ page.title | smartify | escape }}</h1>
+    </header>
+  {% endif %}
+  <div class="prose">
+    {{ content }}
+  </div>
+</article>

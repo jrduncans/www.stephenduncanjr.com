@@ -100,11 +100,26 @@ assert_not_contains() {
 legacy_post="$destination/2002/03/testing.html"
 archive_page="$destination/archive/index.html"
 feed_page="$destination/feed.xml"
+home_page="$destination/index.html"
+stylesheet="$destination/css/default.css"
 
 assert_file "$archive_page"
 assert_file "$destination/404.html"
 assert_file "$destination/feeds/posts/default/index.html"
 assert_file "$feed_page"
+assert_file "$stylesheet"
+assert_contains "$home_page" '<meta name="viewport" content="width=device-width, initial-scale=1">'
+assert_contains "$home_page" '<a class="skip-link" href="#main-content">Skip to content</a>'
+assert_contains "$home_page" '<main id="main-content" class="site-main">'
+assert_contains "$home_page" '<nav class="site-nav" aria-label="Main navigation">'
+assert_contains "$home_page" '<footer class="site-footer">'
+assert_contains "$home_page" '<link rel="canonical" href="https://www.stephenduncanjr.com/">'
+assert_contains "$stylesheet" '--color-bg:'
+assert_contains "$stylesheet" 'prefers-color-scheme: dark'
+assert_contains "$stylesheet" 'prefers-reduced-motion: reduce'
+assert_not_contains "$home_page" '<script'
+assert_not_contains "$home_page" 'google.com/jsapi'
+assert_not_contains "$home_page" 'disqus'
 assert_contains "$archive_page" 'Previous site, 2002–2018'
 assert_contains "$archive_page" '<meta name="robots" content="noindex,follow">'
 assert_contains "$archive_page" '/2002/03/testing.html'
@@ -121,6 +136,8 @@ assert_contains "$destination/2005/04/index.html" '<meta name="robots" content="
 assert_contains "$destination/tag/programming/index.html" '<meta name="robots" content="noindex,follow">'
 assert_contains "$destination/404.html" '<meta name="robots" content="noindex,follow">'
 assert_contains "$destination/feeds/posts/default/index.html" '<meta name="robots" content="noindex,follow">'
+assert_contains "$legacy_post" '<article class="post post--full">'
+assert_not_contains "$legacy_post" 'disqus_thread'
 assert_not_contains "$destination/index.html" 'Testing'
 assert_not_contains "$feed_page" 'testing.html'
 assert_not_contains "$archive_page" 'era: current'
