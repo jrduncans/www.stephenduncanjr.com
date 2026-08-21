@@ -1,6 +1,6 @@
 # Phase 2: Legacy content separation
 
-Status: blocked on Phase 1b
+Status: ready
 
 ## Objective
 

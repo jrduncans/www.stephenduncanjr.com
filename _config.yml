@@ -7,7 +7,7 @@ permalink: /:year/:month/:title:output_ext
 excerpt_separator: ""
 
 exclude:
-  - s3_website.yaml
+  - s3_website.yml
   - docs
   - bin
   - test

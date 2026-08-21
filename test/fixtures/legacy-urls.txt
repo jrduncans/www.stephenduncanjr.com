@@ -373,7 +373,6 @@
 /pictures/Icons/icon9.gif
 /pictures/Icons/icon9.jpg
 /projects.html
-/s3_website.yml
 /scripts/clipboard.swf
 /scripts/shBrushBash.js
 /scripts/shBrushCSharp.js

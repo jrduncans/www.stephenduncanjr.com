@@ -1,6 +1,6 @@
 # Phase 1b: Current, repeatable toolchain baseline
 
-Status: ready
+Status: complete
 
 ## Objective
 
@@ -191,17 +191,31 @@ Stop and report instead of broadening the phase if:
 
 ## Handoff record
 
-When complete, replace this paragraph with:
-
-- exact Ruby, Bundler, Jekyll, plugin, and important renderer versions;
-- files changed and the compatibility-fixture count;
-- macOS install, build, checker, and serve-smoke results;
-- Linux environment and equivalent results;
-- representative output-review findings and accepted non-semantic differences;
-- confirmation that `/s3_website.yml` is absent and every other required path
-  remains;
-- verification that the repository is free of container artifacts;
-- the commit or pull request, if one exists.
-
-Then mark Phase 1b complete and Phase 2 ready in `README.md` and in Phase 2's
-status line.
+- Toolchain: Ruby 4.0.6 from `.ruby-version`, Bundler 4.0.19, Jekyll 4.4.1,
+  `jekyll-feed` 0.17.0, `jekyll-archives` 2.3.0, `jekyll-sass-converter`
+  3.1.0, `kramdown` 2.5.2, and Rouge 4.7.0. The lockfile retains `ruby` and
+  `x86_64-linux` platforms and contains no git, local-path, prerelease, or
+  Jekyll 5 dependency.
+- Changed files: `.ruby-version`, `Gemfile`, `Gemfile.lock`, `_config.yml`,
+  `test/fixtures/legacy-urls.txt`, this handoff, `docs/relaunch/README.md`,
+  and the Phase 2 status line. The compatibility fixture contains 448 paths.
+- macOS: `mise exec -- bundle install` completed from the committed files.
+  `ruby -v` reported Ruby 4.0.6, `bundle -v` reported Bundler 4.0.19,
+  `bundle exec jekyll -v` reported Jekyll 4.4.1, the production build passed,
+  `bin/check-site` verified 448 paths, and `git diff --check` passed. The
+  serve smoke test returned HTTP 200 for `/` and was stopped cleanly.
+- Linux: disposable `ruby:4.0.6-bookworm` with `--platform linux/amd64`,
+  repository mounted read-only and copied into the container. Bundler 4.0.19
+  installed solely from the committed Gemfile and lockfile; Jekyll 4.4.1
+  built with `TZ=America/Los_Angeles` and `JEKYLL_ENV=production`, and
+  `bin/check-site` verified 448 paths. No container artifacts were written to
+  the repository.
+- Representative review: the early HTML post, Markdown post with Rouge
+  highlighting, March 2009 month archive, programming tag archive, feed, CSS
+  and source map, local PNG, and PDF all rendered and remained present. Dates,
+  month assignment, titles, post text, and URLs were unchanged. Accepted
+  non-semantic differences are Jekyll 4.4.1 generator metadata, the build-time
+  feed timestamp, source-map internals, and Rouge's generated token markup.
+- `_site/s3_website.yml` is absent; the other 448 fixture paths remain. The
+  worktree contains no container-generated files. No commit or pull request
+  was created.
