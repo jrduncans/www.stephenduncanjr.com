@@ -77,14 +77,16 @@ Every implementation phase must preserve these properties:
 | Phase | Document | Status | Depends on |
 | --- | --- | --- | --- |
 | 1 | [Baseline and URL compatibility](01-baseline-and-url-compatibility.md) | Complete | None |
-| 2 | [Legacy content separation](02-legacy-content-separation.md) | Ready | Phase 1 |
+| 1b | [Current, repeatable toolchain baseline](01b-toolchain-baseline.md) | Ready | Phase 1 |
+| 2 | [Legacy content separation](02-legacy-content-separation.md) | Blocked | Phase 1b |
 | 3 | [Modern design](03-modern-design.md) | Blocked | Phase 2 |
 | 4 | [Authoring workflow](04-authoring-workflow.md) | Blocked | Phase 2 |
 | 5 | [CI and Pages deployment](05-ci-and-pages-deployment.md) | Blocked | Phases 1-4 |
 | 6 | [Domain cutover and cleanup](06-domain-cutover-and-cleanup.md) | Blocked | Phase 5 and a substantive post |
 
-Phases 3 and 4 may be implemented independently after Phase 2. Phase 5 should
-integrate both before deployment.
+Phase 1b must establish the toolchain used by every later phase. Phases 3 and 4
+may be implemented independently after Phase 2. Phase 5 should integrate both
+before deployment and configure GitHub Actions from the Phase 1b runtime pin.
 
 ## Instructions for an implementation agent
 
