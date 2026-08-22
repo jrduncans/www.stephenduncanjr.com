@@ -1,6 +1,8 @@
 source "https://rubygems.org"
 
-gem "jekyll"
+ruby File.read(File.expand_path(".ruby-version", __dir__)).strip
+
+gem "jekyll", "~> 4.4"
 
 group :jekyll_plugins do
   gem "jekyll-feed"

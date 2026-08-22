@@ -1,0 +1,77 @@
+#!/usr/bin/env ruby
+
+require "date"
+require "fileutils"
+require "yaml"
+
+def abort_with(message)
+  warn message
+  exit 1
+end
+
+def split_front_matter(content)
+  match = content.match(/\A---\s*\r?\n(.*?)\r?\n---\s*\r?\n?(.*)\z/m)
+  abort_with("Draft must start with YAML front matter.") unless match
+
+  [match[1], match[2]]
+end
+
+def valid_permalink?(permalink)
+  permalink.match?(%r{\A/posts/[a-z0-9]+(?:-[a-z0-9]+)*/\z})
+end
+
+abort_with("Usage: bin/publish-post <draft-slug>") unless ARGV.length == 1
+
+slug = ARGV.fetch(0)
+abort_with("Draft slug must contain only lowercase letters, numbers, and hyphens.") unless slug.match?(/\A[a-z0-9]+(?:-[a-z0-9]+)*\z/)
+
+root = File.expand_path("..", __dir__)
+draft_path = File.join(root, "_drafts", "#{slug}.md")
+abort_with("Draft not found: _drafts/#{slug}.md") unless File.file?(draft_path)
+
+front_matter, body = split_front_matter(File.read(draft_path))
+begin
+  data = YAML.safe_load(front_matter, permitted_classes: [Date, DateTime, Time], aliases: false) || {}
+rescue Psych::Exception => error
+  abort_with("Draft front matter is not valid YAML: #{error.message}")
+end
+
+abort_with("Draft title is required.") if data["title"].to_s.strip.empty?
+abort_with("Draft description is required before publishing.") if data["description"].to_s.strip.empty?
+abort_with("Draft must set era: current.") unless data["era"] == "current"
+abort_with("Draft permalink must be /posts/<stable-slug>/.") unless valid_permalink?(data["permalink"].to_s)
+abort_with("Draft permalink must match its filename slug.") unless data["permalink"] == "/posts/#{slug}/"
+
+date_value = data["date"].to_s.strip
+if date_value.empty?
+  date_value = Time.now.getlocal.strftime("%Y-%m-%d %H:%M:%S %z")
+  data["date"] = date_value
+end
+
+unless date_value.match?(/(?:Z|[+-]\d{2}:?\d{2})\z/)
+  abort_with("Draft date must include a timezone, for example: 2026-08-21 09:00:00 -0700")
+end
+
+begin
+  filename_date = DateTime.parse(date_value).strftime("%Y-%m-%d")
+rescue ArgumentError
+  abort_with("Draft date is invalid: #{date_value}")
+end
+
+posts_dir = File.join(root, "_posts")
+published_path = File.join(posts_dir, "#{filename_date}-#{slug}.md")
+abort_with("Published post already exists: _posts/#{File.basename(published_path)}") if File.exist?(published_path)
+
+updated_front_matter = YAML.dump(data).sub(/\A---\s*\n/, "")
+content = "---\n#{updated_front_matter}---\n#{body}"
+
+FileUtils.mkdir_p(posts_dir)
+begin
+  File.open(published_path, File::WRONLY | File::CREAT | File::EXCL, 0o644) { |file| file.write(content) }
+rescue Errno::EEXIST
+  abort_with("Published post already exists: _posts/#{File.basename(published_path)}")
+end
+
+File.delete(draft_path)
+puts "Published _posts/#{File.basename(published_path)}"
+puts "Run bin/check-site before committing. The permalink remains #{data["permalink"]} when the title changes."

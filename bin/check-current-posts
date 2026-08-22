@@ -1,0 +1,93 @@
+#!/usr/bin/env ruby
+
+require "jekyll"
+
+def fail_with(errors)
+  return if errors.empty?
+
+  warn "Current-post validation failed:"
+  errors.each { |error| warn "  - #{error}" }
+  exit 1
+end
+
+def front_matter(content)
+  content[/\A---\s*\r?\n(.*?)\r?\n---/m, 1].to_s
+end
+
+def explicit_field?(front_matter, field)
+  front_matter.match?(/^#{Regexp.escape(field)}:\s*\S/m)
+end
+
+def date_has_timezone?(front_matter)
+  value = front_matter[/^date:\s*(.+?)\s*$/m, 1].to_s.strip.delete_prefix("\"").delete_suffix("\"").delete_prefix("'").delete_suffix("'")
+  value.match?(/(?:Z|[+-]\d{2}:?\d{2})\z/)
+end
+
+def output_path(url)
+  path = url.start_with?("/") ? url : "/#{url}"
+  path.end_with?("/") ? "#{path}index.html" : path
+end
+
+root = File.expand_path("..", __dir__)
+site = Jekyll::Site.new(Jekyll.configuration("source" => root, "destination" => File.join(root, ".jekyll-validation")))
+site.read
+legacy_urls = File.readlines(File.join(root, "test/fixtures/legacy-urls.txt"), chomp: true).to_h { |url| [url, true] }
+
+errors = []
+current_posts = []
+
+site.posts.docs.each do |post|
+  source = File.read(post.path)
+  fields = front_matter(source)
+  explicit_permalink = explicit_field?(fields, "permalink")
+  current = post.data["era"] == "current"
+  current_looking = explicit_permalink && post.data["permalink"].to_s.start_with?("/posts/")
+
+  unless current
+    if current_looking
+      errors << "#{post.relative_path} has a /posts/ permalink but is missing era: current"
+    elsif !legacy_urls[post.url]
+      errors << "#{post.relative_path} is not a preserved legacy post and must set era: current"
+    end
+    next
+  end
+
+  current_posts << post
+  errors << "#{post.relative_path} is missing a title" unless explicit_field?(fields, "title") && !post.data["title"].to_s.strip.empty?
+  errors << "#{post.relative_path} is missing a short description" unless explicit_field?(fields, "description") && !post.data["description"].to_s.strip.empty?
+  errors << "#{post.relative_path} is missing an explicit permalink" unless explicit_permalink
+  errors << "#{post.relative_path} date must be explicit and include a timezone" unless explicit_field?(fields, "date") && date_has_timezone?(fields)
+  errors << "#{post.relative_path} filename must use YYYY-MM-DD-slug.md" unless File.basename(post.path).match?(/\A\d{4}-\d{2}-\d{2}-[a-z0-9]+(?:-[a-z0-9]+)*\.(?:md|markdown|html)\z/)
+
+  permalink = post.data["permalink"].to_s
+  unless permalink.match?(%r{\A/posts/[a-z0-9]+(?:-[a-z0-9]+)*/\z})
+    errors << "#{post.relative_path} permalink must be /posts/<stable-slug>/, not #{permalink.empty? ? "an inherited legacy URL" : permalink.inspect}"
+  end
+end
+
+current_posts.group_by { |post| post.data["permalink"].to_s }.each do |permalink, posts|
+  next if permalink.empty? || posts.length == 1
+
+  errors << "duplicate current permalink #{permalink}: #{posts.map(&:relative_path).join(", ")}"
+end
+
+owners = Hash.new { |hash, key| hash[key] = [] }
+site.collections.each_value do |collection|
+  collection.docs.each { |document| owners[output_path(document.url)] << document.relative_path }
+end
+site.pages.each { |page| owners[output_path(page.url)] << page.relative_path }
+site.static_files.each do |file|
+  relative = file.destination(site.dest).delete_prefix(site.dest)
+  owners["/#{relative.delete_prefix("/")}"] << file.relative_path
+end
+
+current_posts.each do |post|
+  path = output_path(post.url)
+  distinct_owners = owners[path].uniq
+  next if distinct_owners == [post.relative_path]
+
+  errors << "#{post.relative_path} output #{path} collides with #{distinct_owners.join(", ")}"
+end
+
+fail_with(errors)
+puts "Validated #{current_posts.length} current post(s)."

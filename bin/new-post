@@ -1,0 +1,55 @@
+#!/usr/bin/env ruby
+
+require "fileutils"
+require "json"
+
+def abort_with(message)
+  warn message
+  exit 1
+end
+
+abort_with("Usage: bin/new-post \"Post title\"") unless ARGV.length == 1
+
+title = ARGV.fetch(0).strip
+abort_with("Post title cannot be empty.") if title.empty?
+
+slug = title.downcase
+            .encode("ASCII", invalid: :replace, undef: :replace, replace: "")
+            .gsub(/[^a-z0-9]+/, "-")
+            .gsub(/\A-+|-+\z/, "")
+abort_with("Post title does not contain letters or numbers that can make a safe slug.") if slug.empty?
+
+root = File.expand_path("..", __dir__)
+drafts_dir = File.join(root, "_drafts")
+draft_path = File.join(drafts_dir, "#{slug}.md")
+published_path = Dir.glob(File.join(root, "_posts", "*-#{slug}.{md,markdown,html}"))
+
+abort_with("Draft already exists: _drafts/#{slug}.md") if File.exist?(draft_path)
+abort_with("A published post already uses this slug: #{File.basename(published_path.first)}") unless published_path.empty?
+
+FileUtils.mkdir_p(drafts_dir)
+content = <<~MARKDOWN
+  ---
+  layout: post
+  title: #{title.to_json}
+  description: ""
+  era: current
+  permalink: /posts/#{slug}/
+  ---
+
+  Write a short description in the front matter before publishing.
+
+  ```ruby
+  # Fenced code blocks receive Rouge highlighting in the local preview.
+  puts "Hello, world!"
+  ```
+MARKDOWN
+
+begin
+  File.open(draft_path, File::WRONLY | File::CREAT | File::EXCL, 0o644) { |file| file.write(content) }
+rescue Errno::EEXIST
+  abort_with("Draft already exists: _drafts/#{slug}.md")
+end
+
+puts "Created _drafts/#{slug}.md"
+puts "Add a description, preview with drafts, then run: bin/publish-post #{slug}"

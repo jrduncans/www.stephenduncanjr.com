@@ -1,0 +1,12 @@
+---
+layout: base
+---
+<article class="page-content">
+  <header class="page-header">
+    <p class="eyebrow">Compatibility link</p>
+    <h1>{{ page.title | smartify | escape }}</h1>
+  </header>
+  <div class="prose">
+    <p>This address has moved to <a href="{{ page.redirect_to | relative_url }}">{{ page.redirect_to | escape }}</a>.</p>
+  </div>
+</article>

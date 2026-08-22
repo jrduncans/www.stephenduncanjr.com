@@ -1,9 +1,12 @@
 ---
-layout: default
+layout: base
 ---
-<div class="Post">
-	<h3 class="PostTitle">{{ page.post_title | escape }}</h3>
-	<div class="PostBody">
-		{{ content }}
-	</div>
-</div>
+<article class="page-content">
+  <header class="page-header">
+    <p class="eyebrow">Previous site</p>
+    <h1>{{ page.post_title | default: page.title | smartify | escape }}</h1>
+  </header>
+  <div class="prose">
+    {{ content }}
+  </div>
+</article>

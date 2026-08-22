@@ -1,28 +1,17 @@
-<div class="Post">
-  <h3 class="PostTitle">
-    {{ include.item.title | smartify | escape }}
-  </h3>
-  <div class="PostBody">
-    <div style="clear:both;"></div>
-    {{ include.item.content }}
-    <div style="clear:both; padding-bottom:0.25em"></div>
-    
-    {%- if include.item.tags and include.item.tags != empty -%}
-      {%- capture tagscommas -%}
-        {%- for tag in include.item.tags -%}
-          <a rel="tag" class="internal" href="/tag/{{ tag | uri_escape }}">{{ tag | escape }}</a>{% unless forloop.last %}, {% endunless %}
-        {%- endfor -%}
-      {%- endcapture -%}
-      <div class="tags">{{ tagscommas }}</div>
-    {%- endif -%}
+<article class="post-card">
+  <header class="post-card__header">
+    <h3><a href="{{ include.item.url | relative_url }}">{{ include.item.title | smartify | escape }}</a></h3>
+    <p class="post-meta">
+      <time datetime="{{ include.item.date | date_to_xmlschema }}">{{ include.item.date | date: "%B %-d, %Y" }}</time>
+      {% if include.item.author %}<span aria-hidden="true">·</span> <span>by {{ include.item.author | escape }}</span>{% endif %}
+    </p>
+  </header>
+  <div class="post-card__summary">
+    {% if include.item.summary %}
+      {{ include.item.summary | markdownify }}
+    {% else %}
+      <p>{{ include.item.excerpt | default: include.item.content | strip_html | strip_newlines | replace: '  ', ' ' | truncatewords: 55 }}</p>
+    {% endif %}
   </div>
-  <div class="PostFooter">
-    - {{ include.item.author | escape }} @ 
-    <a class="internal" href="{{ include.item.url | relative_url }}" title="permanent link">{{ include.item.date | date: "%l:%M %p" }}</a>
-    | {% if page.layout == "post" %}
-        <a class="internal" href="{{ site.url | relative_url }}">Return to Blog</a>
-      {% else %}
-      <a class="internal" href="{{ include.item.url | relative_url }}#disqus_thread">View comments</a>
-      {% endif %}
-  </div>
-</div>
+  <p class="read-more"><a href="{{ include.item.url | relative_url }}">Read the full entry <span aria-hidden="true">→</span></a></p>
+</article>

@@ -1,6 +1,7 @@
 <div id="archives" class="sidebar">
   <ul class="link_list">
-    {%- assign postsByYear = site.posts | group_by_exp:"post", "post.date | date: '%Y'" | reverse -%}
+    {%- assign current_posts = site.posts | where: "era", "current" -%}
+    {%- assign postsByYear = current_posts | group_by_exp:"post", "post.date | date: '%Y'" | reverse -%}
     {%- for year in postsByYear -%}
       {%- assign postsByMonth = year.items | group_by_exp:"post", "post.date | date: '%m,%B'" -%}
       {%- for month in postsByMonth -%}
