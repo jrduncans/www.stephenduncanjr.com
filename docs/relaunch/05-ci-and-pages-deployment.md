@@ -1,6 +1,6 @@
 # Phase 5: CI and GitHub Pages deployment
 
-Status: blocked on repository Pages settings and public verification
+Status: blocked on the first `main` deployment and public verification
 
 ## Objective
 
@@ -109,15 +109,19 @@ Remove all fixtures before declaring the phase complete.
   canonical, CSS, feed, archive, and 404 checks. The fresh artifact measured
   4.0 MB across 452 files. The local checkout measured 8.9 MB and its Git object
   database 2.0 MB.
-- Successful Actions run: none recorded. No `main` push was made from this
-  task, and deployment is not claimed.
-- Temporary Pages URL: not available until the repository Pages setting is
-  enabled and a successful `main` run is visible.
-- Repository setting changed by the user: none. Required gate: in repository
-  Settings → Pages → Build and deployment, set Source to **GitHub Actions**.
-  After that gate, run the workflow from `main`, record the generated temporary
-  URL, and complete the pre-DNS verification matrix including a subsequent
-  update push.
+- Successful branch Actions run: commit `17203322c3c7519526992a0fcb046ab5e5a9636c`
+  passed the production build and all site checks on the
+  `blog-upgrade-and-reset` branch. As intended, its Pages artifact and deployment
+  steps were skipped because it was not a push to `main`.
+- Successful `main` deployment run: none recorded. No `main` push was made from
+  this task, and deployment is not claimed.
+- Temporary Pages URL: `https://jrduncans.github.io/www.stephenduncanjr.com/`.
+  It continues to serve the abandoned `main` deployment and is not evidence of
+  this phase's deployment until the relaunch branch replaces `main` successfully.
+- Repository setting: Pages is already public with Source set to **GitHub
+  Actions** and HTTPS enforced for the temporary Pages URL. After the relaunch
+  branch replaces `main`, record the successful deployment and complete the
+  pre-DNS verification matrix, including a subsequent update push.
 - AWS/DNS state: no DNS, Pages setting, AWS resource, credential, or S3 file was
   changed. `s3_website.yml` and the S3 origin remain available for rollback.
 - Phase 6 remains blocked on this Pages verification and a substantive

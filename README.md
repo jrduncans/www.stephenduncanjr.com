@@ -58,16 +58,17 @@ Tags are optional. Check the production build and compatibility rules before
 committing, then publish by pushing the owned blog version to `main`:
 
 ```sh
-bin/check-site
+mise exec -- bundle exec bin/check-site
 git add _posts README.md
 git commit -m "Publish a durable title"
 git push origin main
 ```
 
 To correct a published post, edit its Markdown file in `_posts/`, preview and
-run `bin/check-site` again. Keep its `permalink` unchanged—even when its title
-changes—so existing links continue to work. Do not automate or publish a
-LinkedIn adaptation before or instead of the owned blog version.
+run `mise exec -- bundle exec bin/check-site` again. Keep its `permalink`
+unchanged—even when its title changes—so existing links continue to work. Do
+not automate or publish a LinkedIn adaptation before or instead of the owned
+blog version.
 
 ## Author checklist
 
