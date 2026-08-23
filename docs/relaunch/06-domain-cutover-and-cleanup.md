@@ -1,6 +1,6 @@
 # Phase 6: Domain cutover and cleanup
 
-Status: pending DNS rollback capture and user gates
+Status: pending apex edge-cache expiry and seven-day observation
 
 ## Objective
 
@@ -129,3 +129,86 @@ and certificate timing, production verification results, observation dates,
 rollback disposition, AWS cleanup approval/result, and the location of permanent
 operational documentation. Mark Phase 6 and the overall relaunch complete in
 `README.md` before removing the temporary plan directory.
+
+### Pre-cutover rollback snapshot
+
+Captured 2026-08-22 from public DNS before any cutover change:
+
+- Apex `A`: `192.64.119.93`, TTL 1799 seconds.
+- `www` `CNAME`: `www.stephenduncanjr.com.s3-website-us-east-1.amazonaws.com.`,
+  TTL 1799 seconds.
+- Apex `MX`: Namecheap forwarding records `eforward1` through `eforward5` on
+  `registrar-servers.com`, TTL 1800 seconds.
+- Apex `TXT`: `v=spf1 include:spf.efwd.registrar-servers.com ~all`, TTL 1800
+  seconds.
+- Authoritative nameservers: `dns1.registrar-servers.com` and
+  `dns2.registrar-servers.com`.
+- S3 deployment configuration: bucket `www.stephenduncanjr.com`, region
+  `us-east-1`, with the website endpoint represented by the public `www`
+  CNAME above.
+
+Namecheap's complete record list, including any non-public DKIM, DMARC, SPF,
+or unrelated-subdomain records, still needs to be captured from the Namecheap
+DNS editor before changing web records.
+
+The site owner's Namecheap screenshot captured the remaining visible records on
+2026-08-22: the `www` S3 CNAME, the GitHub verification TXT record, an apex
+(`@`) permanent URL redirect to the `www` site, a separate `files` URL redirect,
+and the locked Email Forwarding SPF TXT record. The verification TXT, `files`
+redirect, and mail settings are outside the web cutover and must be preserved.
+
+### Gate 1 checkpoint
+
+The GitHub account domain verification for `stephenduncanjr.com` was completed
+by the site owner on 2026-08-22. The GitHub-provided verification TXT record is
+to remain in DNS.
+
+### Gate 2 checkpoint
+
+The repository's GitHub Pages custom domain was set to
+`www.stephenduncanjr.com` by the site owner on 2026-08-22. No Namecheap DNS
+records have been changed.
+
+### Gate 3 checkpoint
+
+Namecheap web records were changed by the site owner on 2026-08-22. Both
+authoritative Namecheap nameservers publish the four GitHub Pages apex A
+records and `www CNAME jrduncans.github.io`. The GitHub verification TXT and
+Namecheap mail MX/SPF records remain published; the separate `files` redirect
+was preserved.
+
+The first public-resolver check still returned the previous S3 `www` CNAME
+from cache. At 2026-08-23 06:46 UTC, HTTP apex traffic reached GitHub and
+redirected to `http://www`, while HTTP `www` still reached S3; HTTPS was not
+yet valid for the final domains. Certificate provisioning and DNS cache
+settling remain in progress.
+
+### Custom-domain rebuild checkpoint
+
+The first deployment after the custom domain was attached was rerun as GitHub
+Actions run `32620651167` on 2026-08-23. Build checks and Pages deployment both
+passed. The live homepage now emits `/css/default.css` and root-relative site
+links; the former `/www.stephenduncanjr.com/css/default.css` path returns 404.
+The live stylesheet returns HTTP 200 over HTTPS. Canonical metadata is still
+`http://www.stephenduncanjr.com/` until HTTPS enforcement is enabled and the
+site is rebuilt.
+
+### HTTPS and production verification checkpoint
+
+GitHub Pages HTTPS enforcement was enabled by the site owner on 2026-08-23;
+the Pages API reports `https_enforced: true`. The follow-up rerun of Actions
+run `32620651167` passed its build and deployment jobs. The live homepage now
+has an HTTPS canonical URL, HTTPS feed links, and the correct root-relative CSS
+path. `http://www.stephenduncanjr.com` redirects to HTTPS `www`; the apex HTTP
+redirect is still serving a cached pre-enforcement GitHub edge response and
+must be rechecked after that cache expires.
+
+The production matrix returned expected results for the homepage, stylesheet,
+current post, archive, month and tag archives, representative legacy post,
+legacy image, auxiliary page, `/feed.xml`, `/feeds/posts/default`, and 404.
+The compatibility manifest's four transient 503 responses all returned 200 on
+serial retry. Legacy pages and archive routes carried `noindex,follow`, the
+current post was indexable, the feed contained the current post and excluded
+the legacy testing post, and checked page markup had no active mixed-content
+resource references. `/feeds/posts/default` follows the intended static
+noindex compatibility page, which points readers to `/feed.xml`.

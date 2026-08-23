@@ -2,7 +2,7 @@
   color-scheme: light;
   --font-body: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
-  --measure: 38rem;
+  --measure: 44rem;
   --wide-measure: 72rem;
   --space-1: 0.35rem;
   --space-2: 0.65rem;
@@ -452,6 +452,25 @@ hr {
 .prose figure,
 .post-content figure {
   margin: var(--space-5) 0;
+}
+
+/* Give Rouge blocks a little more room for line-number gutters and longer
+   source lines without making them compete with the page edges. */
+.prose figure.highlight,
+.post-content figure.highlight {
+  max-width: 100%;
+  margin-right: 0;
+  margin-left: 0;
+}
+
+@media (min-width: 45rem) {
+  .prose figure.highlight,
+  .post-content figure.highlight {
+    width: min(64rem, calc(100vw - 4rem));
+    max-width: none;
+    margin-left: 50%;
+    transform: translateX(-50%);
+  }
 }
 
 .prose figcaption,
