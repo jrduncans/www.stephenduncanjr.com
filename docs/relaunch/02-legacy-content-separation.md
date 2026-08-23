@@ -40,8 +40,8 @@ available only through a quiet archive and direct links.
 9. Remove legacy tag/month links from primary navigation, but keep their pages
    if required by the compatibility manifest.
 
-The footer link to `/archive/` is implemented visually in Phase 3. The archive
-must still be reachable directly during this phase.
+The subdued link to `/archive/` is implemented at the bottom of the current
+posts page. The archive must still be reachable directly during this phase.
 
 ## Search-engine behavior
 
@@ -111,8 +111,8 @@ Add automated checks proving:
   installed for feed discovery metadata and future compatibility.
 - `/archive/` groups all legacy posts by publication year and title, then links
   to writing, pictures, projects, Firefox, research PDF, About, and preserved
-  compatibility pages. It is `noindex,follow` and is not linked from the
-  current navigation yet; Phase 3 owns the subdued footer link.
+  compatibility pages. It is `noindex,follow` and is linked only from the
+  bottom of the current posts page.
 - The existing month and tag archive routes remain present and are noindexed.
   The archive sidebar now derives only from current posts, so legacy month
   links do not appear in normal navigation.

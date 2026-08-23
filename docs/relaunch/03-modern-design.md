@@ -18,7 +18,9 @@ historical prose or requiring post artwork.
 - All-posts page: every current post in a compact list grouped by year.
 - Post page: title, publication date, readable body, and optional tags rendered
   as metadata rather than a legacy tag cloud.
-- Footer: RSS, GitHub, Mastodon, Bluesky, and a subdued archive link.
+- Footer: an all-posts link, RSS, and alphabetized profile links for Bluesky,
+  GitHub, and Mastodon.
+- Current posts page: a subdued link to the legacy archive at the bottom.
 - No separate About page is required for launch. Do not link to `jrduncans.com`
   until that site exists and is intentionally in scope.
 
@@ -120,8 +122,10 @@ completion.
   homepage and intentional empty state; `_layouts/current_posts.html` provides
   the complete current post index; `_layouts/archive.html` provides the
   noindexed month/tag archive treatment.
-- The linked site title provides the home navigation. The footer provides RSS,
-  GitHub, Mastodon, Bluesky, and a subdued archive link.
+- The linked site title provides the home navigation. The footer provides an
+  all-posts link, RSS, and alphabetized profile links for Bluesky, GitHub, and
+  Mastodon. The current posts page provides the only link to the subdued legacy
+  archive.
 - `_sass/_main.scss` defines the responsive shell, system-font typography,
   readable article measure, landmarks, focus states, lists, tables, quotes,
   figures, overflow behavior, preserved writing-page labels, and reduced-motion

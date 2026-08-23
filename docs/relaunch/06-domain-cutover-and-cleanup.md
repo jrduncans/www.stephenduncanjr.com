@@ -1,6 +1,6 @@
 # Phase 6: Domain cutover and cleanup
 
-Status: pending apex edge-cache expiry and seven-day observation
+Status: pending seven-day observation
 
 ## Objective
 
@@ -212,3 +212,12 @@ current post was indexable, the feed contained the current post and excluded
 the legacy testing post, and checked page markup had no active mixed-content
 resource references. `/feeds/posts/default` follows the intended static
 noindex compatibility page, which points readers to `/feed.xml`.
+
+### Cache recheck
+
+At 2026-08-23 15:46 UTC, the apex HTTP request returned `301 Location:
+https://www.stephenduncanjr.com/` with an edge-cache MISS. The `www` HTTP
+request also redirected to HTTPS, HTTPS apex redirected to HTTPS `www`, and
+the HTTPS `www` homepage returned 200 with the correct HTTPS canonical and
+`/css/default.css` stylesheet URL. The pre-enforcement cached apex redirect is
+no longer present.

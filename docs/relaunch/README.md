@@ -24,7 +24,7 @@ pre-relaunch material into an unobtrusive, non-indexed archive.
 - Treat every existing post and site page as legacy content.
 - Mark legacy pages and the legacy archive `noindex,follow`.
 - Keep legacy content out of the current homepage, feed, and sitemap.
-- Put one subdued legacy-archive link in the site footer.
+- Put one subdued legacy-archive link at the bottom of the current posts page.
 - Author new posts locally as Markdown, then commit and push.
 - Use Rouge for syntax highlighting without a client-side highlighting library.
 - Do not add analytics, comments, newsletters, sharing controls, or third-party
