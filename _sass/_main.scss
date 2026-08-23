@@ -454,6 +454,19 @@ hr {
   margin: var(--space-5) 0;
 }
 
+.prose .extension-icon,
+.post-content .extension-icon {
+  width: 10rem;
+  margin: var(--space-6) auto var(--space-4);
+}
+
+.prose .extension-icon img,
+.post-content .extension-icon img {
+  width: 100%;
+  border-radius: 1.5rem;
+  box-shadow: var(--shadow-soft);
+}
+
 /* Give Rouge blocks a little more room for line-number gutters and longer
    source lines without making them compete with the page edges. */
 .prose figure.highlight,

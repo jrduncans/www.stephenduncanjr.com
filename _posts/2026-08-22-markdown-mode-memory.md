@@ -43,6 +43,10 @@ It then agreed and recommended giving up! However, now I insisted on starting ov
 
 I *think* that I'm not the only person in the world who might like this behavior option, and it also seems like publishing an extension is the easiest way to have it installed for my daily use, so I also used Codex to help me publish it. That was mostly straightforward, except that there are changes to authentication options which are coming to `@vscode/vsce` but not yet fully published, so I needed to guide it on backing off to the best current option after reading the docs myself.
 
+<figure class="extension-icon">
+  <a href="https://marketplace.visualstudio.com/items?itemName=jrduncans.markdown-mode-memory"><img src="{{ '/images/markdown-mode-memory-icon.png' | relative_url }}" alt="Markdown Mode Memory extension icon"></a>
+</figure>
+
 The end result is an extension that you can install yourself if you would also find this helpful when using Markdown in VS Code: [Markdown Mode Memory](https://marketplace.visualstudio.com/items?itemName=jrduncans.markdown-mode-memory). If you have feedback, you can file an issue in the [GitHub repo](https://github.com/jrduncans/vscode-markdown-mode-memory) or find me on social media.
 
 It took from about 9:30 a.m. to 1 p.m. on a Sunday to go from my first prompt to completion. While I did review the code a little to see what it was trying to do and to be able to identify where complexity was coming from, for the most part I was able to produce this while knowing next-to-nothing about VS Code extensions. Despite the very simple requirements, it required a lot of guidance and input from me to build the right thing.
