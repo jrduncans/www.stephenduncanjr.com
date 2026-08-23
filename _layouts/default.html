@@ -4,7 +4,7 @@ layout: base
 <article class="page-content">
   {% if page.title %}
     <header class="page-header">
-      <p class="eyebrow">Previous site</p>
+      {% if page.eyebrow != false %}<p class="eyebrow">{{ page.eyebrow | default: "Previous site" }}</p>{% endif %}
       <h1>{{ page.title | smartify | escape }}</h1>
     </header>
   {% endif %}

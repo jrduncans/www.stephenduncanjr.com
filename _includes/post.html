@@ -1,9 +1,8 @@
 <article class="post-card">
   <header class="post-card__header">
-    <h3><a href="{{ include.item.url | relative_url }}">{{ include.item.title | smartify | escape }}</a></h3>
+    <h2><a href="{{ include.item.url | relative_url }}">{{ include.item.title | smartify | escape }}</a></h2>
     <p class="post-meta">
       <time datetime="{{ include.item.date | date_to_xmlschema }}">{{ include.item.date | date: "%B %-d, %Y" }}</time>
-      {% if include.item.author %}<span aria-hidden="true">·</span> <span>by {{ include.item.author | escape }}</span>{% endif %}
     </p>
   </header>
   <div class="post-card__summary">
@@ -13,5 +12,4 @@
       <p>{{ include.item.excerpt | default: include.item.content | strip_html | strip_newlines | replace: '  ', ' ' | truncatewords: 55 }}</p>
     {% endif %}
   </div>
-  <p class="read-more"><a href="{{ include.item.url | relative_url }}">Read the full entry <span aria-hidden="true">→</span></a></p>
 </article>

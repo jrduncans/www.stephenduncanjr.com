@@ -44,9 +44,7 @@
         <div class="site-header__inner">
           <div class="site-brand">
             <a class="site-title" href="{{ "/" | relative_url }}">{{ site.title | smartify | escape }}</a>
-            <p class="site-description">{{ site.description | smartify | escape }}</p>
           </div>
-          {% include navigation.html %}
         </div>
       </header>
 
@@ -56,9 +54,15 @@
 
       <footer class="site-footer">
         <div class="site-footer__inner">
-          <a href="{{ "/feed.xml" | relative_url }}">RSS feed</a>
+          <a href="{{ "/feed.xml" | relative_url }}">RSS</a>
           <span aria-hidden="true">·</span>
-          <a class="archive-link" href="{{ "/archive/" | relative_url }}">Previous site, 2002–2018</a>
+          <a rel="me" href="https://github.com/jrduncans">GitHub</a>
+          <span aria-hidden="true">·</span>
+          <a rel="me" href="https://hachyderm.io/@jrduncans">Mastodon</a>
+          <span aria-hidden="true">·</span>
+          <a rel="me" href="https://bsky.app/profile/jrduncans.bsky.social">Bluesky</a>
+          <span aria-hidden="true">·</span>
+          <a class="archive-link" href="{{ "/archive/" | relative_url }}">Archive</a>
         </div>
       </footer>
     </div>

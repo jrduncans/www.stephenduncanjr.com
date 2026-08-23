@@ -101,11 +101,13 @@ assert_not_contains() {
 
 legacy_post="$destination/2002/03/testing.html"
 archive_page="$destination/archive/index.html"
+current_posts_page="$destination/posts/index.html"
 feed_page="$destination/feed.xml"
 home_page="$destination/index.html"
 stylesheet="$destination/css/default.css"
 
 assert_file "$archive_page"
+assert_file "$current_posts_page"
 assert_file "$destination/404.html"
 assert_file "$destination/feeds/posts/default/index.html"
 assert_file "$feed_page"
@@ -113,8 +115,15 @@ assert_file "$stylesheet"
 assert_contains "$home_page" '<meta name="viewport" content="width=device-width, initial-scale=1">'
 assert_contains "$home_page" '<a class="skip-link" href="#main-content">Skip to content</a>'
 assert_contains "$home_page" '<main id="main-content" class="site-main">'
-assert_contains "$home_page" '<nav class="site-nav" aria-label="Main navigation">'
+assert_contains "$home_page" '<h1 class="visually-hidden">Recent posts</h1>'
+assert_not_contains "$home_page" '<nav class="site-nav"'
 assert_contains "$home_page" '<footer class="site-footer">'
+assert_contains "$home_page" '>GitHub</a>'
+assert_contains "$home_page" '>Mastodon</a>'
+assert_contains "$home_page" '>Bluesky</a>'
+assert_contains "$home_page" '>Archive</a>'
+assert_not_contains "$home_page" '>Journal</h1>'
+assert_not_contains "$home_page" 'Latest writing'
 assert_contains "$home_page" '<link rel="canonical" href="https://www.stephenduncanjr.com/">'
 assert_contains "$stylesheet" '--color-bg:'
 assert_contains "$stylesheet" 'prefers-color-scheme: dark'
@@ -122,7 +131,8 @@ assert_contains "$stylesheet" 'prefers-reduced-motion: reduce'
 assert_not_contains "$home_page" '<script'
 assert_not_contains "$home_page" 'google.com/jsapi'
 assert_not_contains "$home_page" 'disqus'
-assert_contains "$archive_page" 'Previous site, 2002–2018'
+assert_contains "$archive_page" 'Archive (2002–2018)'
+assert_contains "$archive_page" 'at their original URLs'
 assert_contains "$archive_page" '<meta name="robots" content="noindex,follow">'
 assert_contains "$archive_page" '/2002/03/testing.html'
 assert_contains "$archive_page" '/writing/writing.html'
@@ -130,6 +140,8 @@ assert_contains "$archive_page" '/pictures.html'
 assert_contains "$archive_page" '/projects.html'
 assert_contains "$archive_page" '/firefoxthemes.html'
 assert_contains "$archive_page" 'CooperDuncanGregg4.pdf'
+assert_contains "$current_posts_page" '<h1>All posts</h1>'
+assert_not_contains "$current_posts_page" '<meta name="robots" content="noindex,follow">'
 assert_contains "$legacy_post" '<meta name="robots" content="noindex,follow">'
 assert_contains "$legacy_post" '<link rel="canonical" href="https://www.stephenduncanjr.com/2002/03/testing.html">'
 assert_contains "$destination/about.html" '<meta name="robots" content="noindex,follow">'
@@ -172,12 +184,32 @@ puts "Rouge fixture"
 ~~~
 EOF
 
+for fixture_day in {10..19}; do
+  overflow_slug="homepage-overflow-${fixture_day}"
+  cat > "$fixture_source/_posts/2026-08-${fixture_day}-${overflow_slug}.md" <<EOF
+---
+layout: post
+title: Homepage Overflow Fixture ${fixture_day}
+date: 2026-08-${fixture_day} 12:00:00 -0700
+description: Temporary fixture used to verify the current post index.
+era: current
+permalink: /posts/${overflow_slug}/
+---
+
+This post exists only for the phase verification build.
+EOF
+done
+
 printf 'Building isolated current-era fixture in %s\n' "$fixture_destination"
 TZ=America/Los_Angeles JEKYLL_ENV=production bundle exec jekyll build \
   --source "$fixture_source" \
   --destination "$fixture_destination"
 
 assert_contains "$fixture_destination/index.html" 'Phase 2 Current Fixture'
+assert_contains "$fixture_destination/index.html" '>All posts <span aria-hidden="true">→</span></a>'
+assert_not_contains "$fixture_destination/index.html" 'Homepage Overflow Fixture 10'
+assert_contains "$fixture_destination/posts/index.html" 'Homepage Overflow Fixture 10'
+assert_contains "$fixture_destination/posts/index.html" 'Phase 2 Current Fixture'
 assert_contains "$fixture_destination/feed.xml" 'Phase 2 Current Fixture'
 assert_contains "$fixture_destination/feed.xml" "/posts/${fixture_slug}/"
 assert_contains "$fixture_destination/posts/${fixture_slug}/index.html" 'language-ruby'
@@ -194,7 +226,7 @@ if grep -RFq -- "$fixture_slug" "$root_dir/_posts"; then
   exit 1
 fi
 
-printf 'Verified current-era homepage/feed inclusion and legacy separation.\n'
+printf 'Verified capped current-era homepage, complete post index/feed, and legacy separation.\n'
 
 validation_fixture_source="$(mktemp -d "${TMPDIR:-/tmp}/stephenduncan-current-validation.XXXXXX")"
 cleanup_validation_fixture() {
