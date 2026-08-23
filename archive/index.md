@@ -55,7 +55,4 @@ at their original URLs.</p>
 <h2>Other preserved pages</h2>
 <ul class="link_list">
   <li><a class="internal" href="{% link about.md %}">About Me</a></li>
-  <li><a class="internal" href="{% link error.md %}">Previous error page</a></li>
-  <li><a class="internal" href="{% link google719de6b83ee3367a.html %}">Site verification file</a></li>
-  <li><a class="internal" href="{% link feeds/posts/default.md %}">Former feed URL</a></li>
 </ul>

@@ -81,8 +81,8 @@ Every implementation phase must preserve these properties:
 | 2 | [Legacy content separation](02-legacy-content-separation.md) | Complete | Phase 1b |
 | 3 | [Modern design](03-modern-design.md) | Complete | Phase 2 |
 | 4 | [Authoring workflow](04-authoring-workflow.md) | Complete | Phase 2 |
-| 5 | [CI and Pages deployment](05-ci-and-pages-deployment.md) | Blocked on Pages settings and public verification | Phases 1-4 |
-| 6 | [Domain cutover and cleanup](06-domain-cutover-and-cleanup.md) | Blocked | Phase 5 and a substantive post |
+| 5 | [CI and Pages deployment](05-ci-and-pages-deployment.md) | Complete | Phases 1-4 |
+| 6 | [Domain cutover and cleanup](06-domain-cutover-and-cleanup.md) | Pending DNS rollback capture and user gates | Phase 5 and a substantive post |
 
 Phase 1b must establish the toolchain used by every later phase. Phases 3 and 4
 may be implemented independently after Phase 2. Phase 5 should integrate both

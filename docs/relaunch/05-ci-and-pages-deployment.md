@@ -1,6 +1,6 @@
 # Phase 5: CI and GitHub Pages deployment
 
-Status: blocked on the first `main` deployment and public verification
+Status: complete
 
 ## Objective
 
@@ -113,17 +113,28 @@ Remove all fixtures before declaring the phase complete.
   passed the production build and all site checks on the
   `blog-upgrade-and-reset` branch. As intended, its Pages artifact and deployment
   steps were skipped because it was not a push to `main`.
-- Successful `main` deployment run: none recorded. No `main` push was made from
-  this task, and deployment is not claimed.
+- Deployment-gate verification: the successful pull-request run
+  `32618543480` and successful non-`main` push run `32618539542` skipped artifact
+  upload and deployment. Both successful `main` runs `32551919463` and
+  `32618573390` completed the build, artifact upload, and deployment jobs.
+- Successful `main` deployments: run `32551919463` deployed commit
+  `97f8328f5a5dcc0d29bfab9f2b5d8962603310bc`; the subsequent run
+  `32618573390` deployed commit
+  `8f87ab540590555e69c6ac3e7e34424e2f3933dc` and completed successfully. The
+  second run is the verified update deployment.
 - Temporary Pages URL: `https://jrduncans.github.io/www.stephenduncanjr.com/`.
-  It continues to serve the abandoned `main` deployment and is not evidence of
-  this phase's deployment until the relaunch branch replaces `main` successfully.
-- Repository setting: Pages is already public with Source set to **GitHub
-  Actions** and HTTPS enforced for the temporary Pages URL. After the relaunch
-  branch replaces `main`, record the successful deployment and complete the
-  pre-DNS verification matrix, including a subsequent update push.
+  The homepage, current post, archive, representative legacy paths, compatibility
+  feed path, and 404 page all returned HTTP 200. Canonical and `noindex` metadata
+  matched the current/legacy rules, CSS loaded, and desktop plus 375x812 mobile
+  rendering was checked without horizontal overflow.
+- Feed verification: `/feed.xml` returned HTTP 200 as `application/xml`; the
+  live Atom document parsed successfully, included the current post, and
+  excluded the legacy `testing.html` post.
+- Repository setting: Pages is public with `build_type: workflow`, source
+  `main:/`, status `built`, HTTPS enforcement enabled, and no custom domain
+  configured. The S3 origin remains available for rollback.
 - AWS/DNS state: no DNS, Pages setting, AWS resource, credential, or S3 file was
   changed. `s3_website.yml` and the S3 origin remain available for rollback.
-- Phase 6 remains blocked on this Pages verification and a substantive
-  current-era post. Phase 5 must not be marked complete until the temporary
-  Pages site and update deployment are verified.
+- Phase 6's technical prerequisites from this phase are satisfied; it remains
+  pending DNS rollback-record capture and its user gates. No DNS, custom-domain,
+  AWS resource, or S3 file was changed here.

@@ -1,6 +1,6 @@
 # Phase 6: Domain cutover and cleanup
 
-Status: blocked on Phase 5 and a substantive current post
+Status: pending DNS rollback capture and user gates
 
 ## Objective
 
