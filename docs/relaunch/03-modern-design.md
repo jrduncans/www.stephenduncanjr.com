@@ -11,18 +11,20 @@ historical prose or requiring post artwork.
 ## Public information architecture
 
 - Header: provisional site title, linked to `/`.
-- Main navigation: minimal; do not reproduce the old feature list.
-- Homepage: current post title, date, and authored summary or restrained
-  excerpt. No image placeholder.
+- Main navigation: omitted until the site has useful current destinations.
+- Homepage: the ten most recent current post titles, dates, and authored
+  summaries or restrained excerpts, with no visible page label or image
+  placeholder. A compact all-posts link appears when the list exceeds ten.
+- All-posts page: every current post in a compact list grouped by year.
 - Post page: title, publication date, readable body, and optional tags rendered
   as metadata rather than a legacy tag cloud.
-- Footer: RSS link and one subdued `Previous site, 2002–2018` archive link.
+- Footer: RSS, GitHub, Mastodon, Bluesky, and a subdued archive link.
 - No separate About page is required for launch. Do not link to `jrduncans.com`
   until that site exists and is intentionally in scope.
 
 ## Design requirements
 
-- Semantic landmarks (`header`, `nav`, `main`, `article`, `footer`).
+- Semantic landmarks (`header`, `main`, `article`, `footer`).
 - A skip link and visible keyboard focus states.
 - Responsive layout from narrow phones through wide desktop screens.
 - A comfortable article measure, approximately 65-75 characters.
@@ -91,7 +93,7 @@ completion.
 - The site is usable without JavaScript and makes no non-content third-party
   runtime requests.
 - Text-only posts look complete and intentional.
-- Navigation is small, consistent, and keyboard accessible.
+- Header and footer links are small, consistent, and keyboard accessible.
 - Mobile pages have no unintended horizontal scrolling.
 - Code highlighting is readable in both color schemes.
 - Legacy bodies remain intact and their URLs pass the compatibility check.
@@ -111,14 +113,15 @@ completion.
 
 - `_layouts/base.html` now owns the document head, page-specific metadata,
   self-canonical HTTPS `www` URLs, feed discovery, skip link, site header,
-  minimal navigation, main landmark, and footer.
+  main landmark, and footer.
 - `_layouts/default.html` provides the shared legacy page article wrapper;
   `_layouts/post.html` provides the title/date/author/article/tag treatment for
   both current and legacy posts; `_layouts/posts.html` provides the current-era
-  homepage and intentional empty state; `_layouts/archive.html` provides the
+  homepage and intentional empty state; `_layouts/current_posts.html` provides
+  the complete current post index; `_layouts/archive.html` provides the
   noindexed month/tag archive treatment.
-- `_includes/navigation.html` is reduced to the home link. The footer keeps the
-  required RSS link and one subdued `Previous site, 2002–2018` archive link.
+- The linked site title provides the home navigation. The footer provides RSS,
+  GitHub, Mastodon, Bluesky, and a subdued archive link.
 - `_sass/_main.scss` defines the responsive shell, system-font typography,
   readable article measure, landmarks, focus states, lists, tables, quotes,
   figures, overflow behavior, preserved writing-page labels, and reduced-motion

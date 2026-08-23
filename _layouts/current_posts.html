@@ -1,0 +1,32 @@
+---
+layout: base
+---
+<article class="all-posts-page">
+  <header class="page-header">
+    <h1>{{ page.title | smartify | escape }}</h1>
+  </header>
+
+  {%- assign current_posts = site.posts | where: "era", "current" -%}
+  {% if current_posts != empty %}
+    <div class="post-index">
+      {%- assign posts_by_year = current_posts | group_by_exp: "post", "post.date | date: '%Y'" -%}
+      {%- for year in posts_by_year -%}
+        <section class="post-index__year" aria-labelledby="posts-{{ year.name }}">
+          <h2 id="posts-{{ year.name }}">{{ year.name }}</h2>
+          <ol>
+            {%- for post in year.items -%}
+              <li>
+                <time datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: "%b %-d" }}</time>
+                <a href="{{ post.url | relative_url }}">{{ post.title | smartify | escape }}</a>
+              </li>
+            {%- endfor -%}
+          </ol>
+        </section>
+      {%- endfor -%}
+    </div>
+  {% else %}
+    <div class="empty-state">
+      <p>No posts yet.</p>
+    </div>
+  {% endif %}
+</article>

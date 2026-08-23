@@ -3,11 +3,11 @@ layout: base
 ---
 <article class="post post--full">
   <header class="post-header">
-    <p class="eyebrow">{% if page.era == "current" %}Journal entry{% else %}From the archive{% endif %}</p>
+    {% if page.era != "current" %}<p class="eyebrow">From the archive</p>{% endif %}
     <h1>{{ page.title | smartify | escape }}</h1>
     <p class="post-meta">
       <time datetime="{{ page.date | date_to_xmlschema }}">{{ page.date | date: "%B %-d, %Y" }}</time>
-      {% if page.author %}<span aria-hidden="true">·</span> <span>by {{ page.author | escape }}</span>{% endif %}
+      {% if page.author and page.era != "current" %}<span aria-hidden="true">·</span> <span>by {{ page.author | escape }}</span>{% endif %}
     </p>
   </header>
 
@@ -17,7 +17,7 @@ layout: base
 
   {%- if page.tags and page.tags != empty -%}
     <footer class="post-footer">
-      <span class="post-footer__label">Tagged</span>
+      <span class="post-footer__label">Tags</span>
       <ul class="tag-list" aria-label="Tags">
         {%- for tag in page.tags -%}
           {%- assign tag_slug = tag | slugify -%}

@@ -2,26 +2,20 @@
 layout: base
 ---
 <article class="home-page">
-  <header class="page-header home-header">
-    <p class="eyebrow">Journal</p>
-    <h1>Notes on software, the web, and everything else</h1>
-    <p class="lede">A text-first home for Stephen Duncan Jr.’s writing.</p>
-  </header>
-
-  <section class="post-list" aria-labelledby="latest-heading">
-    <div class="section-heading">
-      <h2 id="latest-heading">Latest writing</h2>
-    </div>
+  <h1 class="visually-hidden">Recent posts</h1>
+  <div class="post-list">
   {%- assign current_posts = site.posts | where: "era", "current" -%}
     {% if current_posts != empty %}
-      {%- for post in current_posts limit: 15 -%}
+      {%- for post in current_posts limit: 10 -%}
         {% include post.html item=post %}
       {%- endfor -%}
+      {% if current_posts.size > 10 %}
+        <p class="all-posts-link"><a href="{{ "/posts/" | relative_url }}">All posts <span aria-hidden="true">→</span></a></p>
+      {% endif %}
     {% else %}
       <div class="empty-state">
-        <h3>The next post is on its way.</h3>
-        <p>This site is ready for new writing. In the meantime, the <a href="{{ "/archive/" | relative_url }}">previous site archive</a> holds the older material.</p>
+        <p>No posts yet. Older posts are available in the <a href="{{ "/archive/" | relative_url }}">archive</a>.</p>
       </div>
     {% endif %}
-  </section>
+  </div>
 </article>

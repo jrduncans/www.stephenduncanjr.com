@@ -1,13 +1,13 @@
 ---
 layout: default
-title: Previous site, 2002–2018
+title: Archive (2002–2018)
+eyebrow: false
 legacy: false
 noindex: true
 ---
 
-<p>This is a quiet archive of the previous site. Historical pages remain
-available at their original URLs, but are no longer part of the site's current
-publishing surface.</p>
+<p>Posts and other material from the previous version of this site, preserved
+at their original URLs.</p>
 
 <h2>Posts by year</h2>
 {%- assign legacy_posts = site.posts | where_exp: "post", "post.era != 'current'" -%}
