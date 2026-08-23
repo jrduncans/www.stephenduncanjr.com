@@ -25,12 +25,17 @@ It proposed a plan that it thought would work more reliably than the first try, 
 
 ```text
 You’re right. I would not ship two modes.
+
 The cleaner design is one mechanism: keep the preference private to the workspace and always enforce it by reopening the active tab. Do not edit workbench.editorAssociations at all.
+
 The prototype only needs one improvement: apply the remembered mode in both directions.
+
 - Remembered Preview/hybrid + new source tab → reopen it as Preview/hybrid.
 - Remembered source + a user association opens a new Preview/hybrid tab → reopen it as the default text editor.
 - A same-file transition—Preview → source, source → hybrid, etc.—is recognized as an intentional user choice and becomes the new remembered mode.
+
 Store that preference in workspaceState, rather than globalState, so each project naturally remembers its own last Markdown mode without writing to .vscode/settings.json, changing Git-tracked files, or adding product concepts.
+
 The tradeoff is the brief reopen flicker. I think that’s much more acceptable than silently changing workspace configuration—and it keeps the extension’s story wonderfully simple: “Markdown files open in the last Markdown mode you used in this workspace.”
 ```
 
