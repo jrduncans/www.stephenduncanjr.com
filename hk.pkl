@@ -63,7 +63,9 @@ hooks {
     ["pre-push"] {
         steps {
             // The full production build plus URL-compatibility checks.
+            // The glob matches every file, so it is skipped when no files are pushed (remote branch deletion).
             ["check_site"] = new Step {
+                glob = "**/*"
                 check = new CommandSpec { command = "bundle exec bin/check-site"; effect = "read" }
             }
         }
