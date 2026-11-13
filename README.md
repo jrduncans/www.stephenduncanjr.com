@@ -3,13 +3,24 @@
 This is a Jekyll site. New technical posts are written locally in Markdown and
 published by committing and pushing to `main`.
 
-## Authoring a post
+## Toolchain
 
-Install the repository's locked Ruby dependencies with:
+[mise](https://mise.jdx.dev) pins Ruby and the lint tools in `mise.toml`, the
+single version source for local work and CI (the Gemfile reads its Ruby version
+from there). Install them, the locked gems, and the git hooks with:
 
 ```sh
+mise install
 bundle install
+hk install
 ```
+
+[hk](https://hk.jdx.dev) runs the linters in `hk.pkl` on commit and the full
+site check on push. They cover the scripts, plugins, templates, styles and CI
+config, not post content. Run them by hand with `hk check --all`, or apply
+automatic fixes with `hk fix --all`.
+
+## Authoring a post
 
 Create a draft from a title. The command makes a conservative stable slug,
 will not overwrite a draft, and also refuses a slug already used by a published

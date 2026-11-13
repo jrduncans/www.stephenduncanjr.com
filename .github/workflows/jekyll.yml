@@ -3,6 +3,14 @@ name: Build and deploy site
 on:
   pull_request:
   push:
+    branches:
+      - main
+
+# A newer pull request push cancels the older run; pushes to main each get their
+# own group and never cancel. The deploy job also serializes on github-pages.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 permissions:
   contents: read
@@ -11,22 +19,35 @@ jobs:
   build:
     name: Build and verify
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     permissions:
       contents: read
       pages: read
     env:
       TZ: America/Los_Angeles
       JEKYLL_ENV: production
+      BUNDLE_PATH: vendor/bundle
+      BUNDLE_DEPLOYMENT: "true"
     steps:
       - name: Check out repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-
-      - name: Set up Ruby
-        uses: ruby/setup-ruby@95ef2b042f9d7a56d8268cba8559e2842e2ad01b # v1.321.0
         with:
-          ruby-version: 4.0.6
-          bundler: 4.0.19
-          bundler-cache: true
+          persist-credentials: false
+
+      - name: Set up Ruby and tools with mise
+        uses: jdx/mise-action@d5574b52816a478f9d4e6529a3f6ff17a8a36785 # v5.2.8
+
+      - name: Cache gems
+        uses: actions/cache@caa296126883cff596d87d8935842f9db880ef25 # v5.1.0
+        with:
+          path: vendor/bundle
+          key: gems-${{ runner.os }}-${{ hashFiles('mise.toml', 'Gemfile.lock') }}
+
+      - name: Install gems
+        run: bundle install --jobs 4
+
+      - name: Run hk checks
+        run: hk check --all
 
       - name: Build production site
         run: bundle exec jekyll build --destination ./_site
@@ -61,6 +82,7 @@ jobs:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     needs: build
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     permissions:
       pages: write
       id-token: write
