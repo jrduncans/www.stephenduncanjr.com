@@ -1,3 +1,2 @@
 [daemons.draft]
 run = "bundle exec jekyll serve --drafts --livereload"
-auto = ["start", "stop"]
