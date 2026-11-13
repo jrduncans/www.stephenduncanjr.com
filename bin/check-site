@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-root_dir="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
+root_dir="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
 fixture="$root_dir/test/fixtures/legacy-urls.txt"
 destination="$(mktemp -d "${TMPDIR:-/tmp}/stephenduncan-site-check.XXXXXX")"
 
@@ -60,9 +60,9 @@ while IFS= read -r url_path || [[ -n "$url_path" ]]; do
     missing_count=$((missing_count + 1))
     missing_paths+=("$url_path")
   fi
-done < "$fixture"
+done <"$fixture"
 
-if (( missing_count > 0 )); then
+if ((missing_count > 0)); then
   printf 'Missing %d of %d required legacy paths:\n' "$missing_count" "$required_count" >&2
   printf '  %s\n' "${missing_paths[@]}" >&2
   exit 1
@@ -172,7 +172,7 @@ cleanup_fixture() {
 trap cleanup_fixture EXIT
 
 cp -R -- "$root_dir"/. "$fixture_source"/
-cat > "$fixture_source/_posts/2026-08-20-${fixture_slug}.md" <<EOF
+cat >"$fixture_source/_posts/2026-08-20-${fixture_slug}.md" <<EOF
 ---
 layout: post
 title: Phase 2 Current Fixture
@@ -191,7 +191,7 @@ EOF
 
 for fixture_day in {10..19}; do
   overflow_slug="homepage-overflow-${fixture_day}"
-  cat > "$fixture_source/_posts/2026-08-${fixture_day}-${overflow_slug}.md" <<EOF
+  cat >"$fixture_source/_posts/2026-08-${fixture_day}-${overflow_slug}.md" <<EOF
 ---
 layout: post
 title: Homepage Overflow Fixture ${fixture_day}
@@ -223,7 +223,7 @@ assert_not_contains "$fixture_destination/posts/${fixture_slug}/index.html" '<me
 assert_not_contains "$fixture_destination/archive/index.html" 'Phase 2 Current Fixture'
 assert_not_contains "$destination/index.html" 'Phase 2 Current Fixture'
 assert_not_contains "$destination/feed.xml" 'Phase 2 Current Fixture'
-if ! ruby -rrexml/document -e 'REXML::Document.new(File.read(ARGV.fetch(0)))' "$feed_page"; then
+if ! ruby -EUTF-8 -rrexml/document -e 'REXML::Document.new(File.read(ARGV.fetch(0)))' "$feed_page"; then
   printf 'Generated feed is not valid XML: %s\n' "$feed_page" >&2
   exit 1
 fi
@@ -255,7 +255,7 @@ check_invalid_current_post() {
   fi
 }
 
-cat > "$validation_fixture_source/_posts/2026-08-20-missing-description.md" <<'EOF'
+cat >"$validation_fixture_source/_posts/2026-08-20-missing-description.md" <<'EOF'
 ---
 layout: post
 title: Missing description fixture
@@ -267,7 +267,7 @@ EOF
 check_invalid_current_post 'missing a short description'
 rm "$validation_fixture_source/_posts/2026-08-20-missing-description.md"
 
-cat > "$validation_fixture_source/_posts/2026-08-20-missing-era.md" <<'EOF'
+cat >"$validation_fixture_source/_posts/2026-08-20-missing-era.md" <<'EOF'
 ---
 layout: post
 title: Missing era fixture
@@ -279,7 +279,7 @@ EOF
 check_invalid_current_post 'missing era: current'
 rm "$validation_fixture_source/_posts/2026-08-20-missing-era.md"
 
-cat > "$validation_fixture_source/_posts/2026-08-20-unmarked-dated-post.md" <<'EOF'
+cat >"$validation_fixture_source/_posts/2026-08-20-unmarked-dated-post.md" <<'EOF'
 ---
 layout: post
 title: Unmarked dated post fixture
@@ -290,7 +290,7 @@ EOF
 check_invalid_current_post 'is not a preserved legacy post and must set era: current'
 rm "$validation_fixture_source/_posts/2026-08-20-unmarked-dated-post.md"
 
-cat > "$validation_fixture_source/_posts/2026-08-20-duplicate-one.md" <<'EOF'
+cat >"$validation_fixture_source/_posts/2026-08-20-duplicate-one.md" <<'EOF'
 ---
 layout: post
 title: Duplicate one fixture
@@ -300,7 +300,7 @@ era: current
 permalink: /posts/duplicate-fixture/
 ---
 EOF
-cat > "$validation_fixture_source/_posts/2026-08-21-duplicate-two.md" <<'EOF'
+cat >"$validation_fixture_source/_posts/2026-08-21-duplicate-two.md" <<'EOF'
 ---
 layout: post
 title: Duplicate two fixture
@@ -313,7 +313,7 @@ EOF
 check_invalid_current_post 'duplicate current permalink /posts/duplicate-fixture/'
 rm "$validation_fixture_source/_posts/2026-08-20-duplicate-one.md" "$validation_fixture_source/_posts/2026-08-21-duplicate-two.md"
 
-cat > "$validation_fixture_source/_posts/2026-08-20-legacy-url.md" <<'EOF'
+cat >"$validation_fixture_source/_posts/2026-08-20-legacy-url.md" <<'EOF'
 ---
 layout: post
 title: Legacy URL fixture
@@ -327,13 +327,13 @@ check_invalid_current_post 'permalink must be /posts/<stable-slug>/'
 rm "$validation_fixture_source/_posts/2026-08-20-legacy-url.md"
 
 mkdir -p "$validation_fixture_source/posts/output-collision"
-cat > "$validation_fixture_source/posts/output-collision/index.md" <<'EOF'
+cat >"$validation_fixture_source/posts/output-collision/index.md" <<'EOF'
 ---
 layout: default
 title: Output collision fixture
 ---
 EOF
-cat > "$validation_fixture_source/_posts/2026-08-20-output-collision.md" <<'EOF'
+cat >"$validation_fixture_source/_posts/2026-08-20-output-collision.md" <<'EOF'
 ---
 layout: post
 title: Output collision fixture

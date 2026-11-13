@@ -1,5 +1,8 @@
 #!/usr/bin/env ruby
 
+# Read text as UTF-8 even without a UTF-8 locale (e.g. git hooks run by GUI clients).
+Encoding.default_external = Encoding::UTF_8
+
 require "fileutils"
 require "json"
 
@@ -14,9 +17,9 @@ title = ARGV.fetch(0).strip
 abort_with("Post title cannot be empty.") if title.empty?
 
 slug = title.downcase
-            .encode("ASCII", invalid: :replace, undef: :replace, replace: "")
-            .gsub(/[^a-z0-9]+/, "-")
-            .gsub(/\A-+|-+\z/, "")
+  .encode("ASCII", invalid: :replace, undef: :replace, replace: "")
+  .gsub(/[^a-z0-9]+/, "-")
+  .gsub(/\A-+|-+\z/, "")
 abort_with("Post title does not contain letters or numbers that can make a safe slug.") if slug.empty?
 
 root = File.expand_path("..", __dir__)
