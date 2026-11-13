@@ -223,7 +223,7 @@ assert_not_contains "$fixture_destination/posts/${fixture_slug}/index.html" '<me
 assert_not_contains "$fixture_destination/archive/index.html" 'Phase 2 Current Fixture'
 assert_not_contains "$destination/index.html" 'Phase 2 Current Fixture'
 assert_not_contains "$destination/feed.xml" 'Phase 2 Current Fixture'
-if ! ruby -rrexml/document -e 'REXML::Document.new(File.read(ARGV.fetch(0)))' "$feed_page"; then
+if ! ruby -EUTF-8 -rrexml/document -e 'REXML::Document.new(File.read(ARGV.fetch(0)))' "$feed_page"; then
   printf 'Generated feed is not valid XML: %s\n' "$feed_page" >&2
   exit 1
 fi

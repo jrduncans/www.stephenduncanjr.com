@@ -1,5 +1,8 @@
 #!/usr/bin/env ruby
 
+# Read text as UTF-8 even without a UTF-8 locale (e.g. git hooks run by GUI clients).
+Encoding.default_external = Encoding::UTF_8
+
 require "jekyll"
 
 def fail_with(errors)
